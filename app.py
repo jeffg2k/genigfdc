@@ -23,7 +23,7 @@ def index():
 def login():
     params = {
         'client_id': '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO',
-        'redirect_uri': 'http://localhost:5000/home'
+        'redirect_uri': 'http://mysterious-citadel-7993.herokuapp.com/home'
     }
     return redirect(buildAuthUrl('platform/oauth/authorize', params=params))
 
@@ -107,7 +107,7 @@ def getNewTokenFromApi(code):
               'client_id': '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO',
               'client_secret': '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0',
               'code': code,
-              'redirect_url': 'http://localhost:5000/home'
+              'redirect_url': 'http://mysterious-citadel-7993.herokuapp.com/home'
     }
     print 'calling request token api'
     tokenResponse = requests.get(url, params=params)
@@ -135,7 +135,7 @@ def getRefreshTokenFromApi(refreshToken):
     params = {
               'client_id': '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO',
               'client_secret': '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0',
-              'redirect_url': 'http://localhost:5000/home',
+              'redirect_url': 'http://mysterious-citadel-7993.herokuapp.com/home',
               'refresh_token': refreshToken,
               'grant_type': 'refresh_token'
     }
