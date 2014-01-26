@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Geni Api App Home</title>
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script>
+	$(document).ready(function(){
+  	$("#btnGetProfile").click(function(){
+		var inputValue = {};
+		$.each($('#homeForm').serializeArray(), function(i, field) {
+    		inputValue[field.name] = field.value;
+		});
+    	$.get("/getProfile", inputValue )
+  			.done(function( data ) {
+  			data = $.parseJSON(data);
+    		//$("#outputProfile").append(data);
+    		$("#outputProfile").append("<b>User Profile</b>");
+    		$("#outputProfile").append("<br/>");
+    		$("#outputProfile").append("============");
+    		$("#outputProfile").append("<br/>");
+    		$("#outputProfile").append("ProfileId : ").append(data.focus.id);
+    		$("#outputProfile").append("<br/>");
+    		$("#outputProfile").append("Name : ").append(data.focus.first_name + " " + data.focus.last_name);
+    		$("#outputProfile").append("<br/>");
+    		$("#outputProfile").append("Gender : ").append(data.focus.gender);
+    		$("#outputProfile").append("<br/>");
+    		$("#outputProfile").append("URL : ").append(data.focus.url);
+    		$("#outputProfile").append("<br/><br/>");
+    		$("#outputProfile").append("<b>Relations</b>");
+    		$("#outputProfile").append("<br/>");
+			$("#outputProfile").append("=========");
+			$("#outputProfile").append("<br/>");
+			//Relations
+			$.each(data.nodes, function(i, item) {
+				if(item.id) {
+    				$("#outputProfile").append(item.first_name + " " + item.last_name + "<br/>");
+    			}
+  			});
+  		});
+  	});
+	});
+	</script>
+</head>
+<body align="center">
+	<h1>Geni App Home</h1><br/>
+	--------------------------------<br/>
+	<form id="homeForm">
+		<div>
+			<p><label>Enter Profile Id to get data</label></p>
+			<input id="txtProfileId" name="profileId" type="text"/>&nbsp;&nbsp;
+			<button id="btnGetProfile" type="button">Get profile</button>
+		</div>
+		<br/>
+		<div id="outputProfile"></div>
+	</form>
+</body>
+</html>
