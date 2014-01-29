@@ -8,6 +8,8 @@ import requests
 app = Flask(__name__)
 
 BASE_URL = 'https://www.geni.com/'
+REDIRECT_URL = 'http://mysterious-citadel-7993.herokuapp.com/home'
+#REDIRECT_URL = 'http://localhost:5000/home'
 
 @app.route('/')
 def index():
@@ -23,7 +25,7 @@ def index():
 def login():
     params = {
         'client_id': '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO',
-        'redirect_uri': 'http://mysterious-citadel-7993.herokuapp.com/home'
+        'redirect_uri': REDIRECT_URL
     }
     return redirect(buildAuthUrl('platform/oauth/authorize', params=params))
 
@@ -53,8 +55,9 @@ def getProfile():
     FAM_URL = 'https://www.geni.com/api/profile/immediate-family'
     PROF_URL = 'https://www.geni.com/api/profile'
     print profileId
-    #profileResponse = requests.get(PROFILE_URL);//34655101643
-    payload = {'ids': profileId, 'access_token':'5e4qSBXxtEctU3JTuY3tJjAZx4sCxRyKLzKnOLSe'}
+    #profileResponse = requests.get(PROFILE_URL);//6000000024491145741
+    accessToken = getAccessToken()
+    payload = {'guids': profileId, 'access_token':accessToken}
     profileResponse = requests.get(FAM_URL, params=payload)
     print profileResponse.text
     return profileResponse.text
@@ -101,13 +104,21 @@ def getToken(code):
         tokenResponse = getNewTokenFromApi(code)
     return tokenResponse
 
+def getAccessToken():
+    accessToken = ''
+    if os.path.exists('./auth-keys'):
+        boxFile = open('./auth-keys', 'r')
+        accessToken = boxFile.readline().rstrip()
+        boxFile.close()
+    return accessToken
+
 def getNewTokenFromApi(code):
     url = 'https://www.geni.com/platform/oauth/request_token'
     params = {
               'client_id': '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO',
               'client_secret': '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0',
               'code': code,
-              'redirect_url': 'http://mysterious-citadel-7993.herokuapp.com/home'
+              'redirect_url': REDIRECT_URL
     }
     print 'calling request token api'
     tokenResponse = requests.get(url, params=params)
@@ -135,7 +146,7 @@ def getRefreshTokenFromApi(refreshToken):
     params = {
               'client_id': '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO',
               'client_secret': '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0',
-              'redirect_url': 'http://mysterious-citadel-7993.herokuapp.com/home',
+              'redirect_url': REDIRECT_URL,
               'refresh_token': refreshToken,
               'grant_type': 'refresh_token'
     }
