@@ -14,11 +14,6 @@ REDIRECT_URL = 'http://mysterious-citadel-7993.herokuapp.com/home'
 @app.route('/')
 def index():
     print 'in /'
-    #return 'Hello from GeniApp!'
-    #if(isTokenExpired()):
-    #    return send_file('templates/login.html')
-    #else:
-    #    return send_file('templates/home.html')
     return send_file('templates/login.html')
 
 @app.route('/login')
@@ -41,76 +36,40 @@ def home():
     code = request.args.get('code')
     print 'code-' + code
     print 'expires-' + request.args.get('expires_in')
-    #oauthResponse = getToken(code=request.args.get('code'))
-    jsonToken = getToken(code)
+    tokenResponse = getNewTokenFromApi(code)
     print 'got token!!!!'
-    print jsonToken
+    print tokenResponse
+    session['accessToken'] = tokenResponse['access_token']
+    session['refreshToken'] = tokenResponse['refresh_token']
+    session['tokenExpiration'] = tokenResponse['expires_in']
     return send_file('templates/home.html')
 
 @app.route('/getProfile', methods=['GET'])
 def getProfile():
     print 'in /getProfile'
-    profileId = request.args.get('profileId')
+    #profileId = request.args.get('profileId')
     #record = json.loads(request.data)
     FAM_URL = 'https://www.geni.com/api/profile/immediate-family'
     PROF_URL = 'https://www.geni.com/api/profile'
-    print profileId
+    #print profileId
     #profileResponse = requests.get(PROFILE_URL);//6000000024491145741
-    accessToken = getAccessToken()
-    payload = {'guids': profileId, 'access_token':accessToken}
+    accessToken = session['accessToken']
+    payload = {'access_token':accessToken}
     profileResponse = requests.get(FAM_URL, params=payload)
     print profileResponse.text
     return profileResponse.text
 
-def isTokenExpired():
-    if os.path.exists('./auth-keys'):
-        boxFile = open('./auth-keys', 'r')
-        tokenResponse = {}
-        tokenResponse['access_token'] = boxFile.readline().rstrip()
-        tokenResponse['refresh_token'] = boxFile.readline().rstrip()
-        tokenResponse['expires_in'] = boxFile.readline().rstrip()
-        boxFile.close()
-        oauthExpirationStr = tokenResponse['expires_in'][:19]
-        oauthExpirationDate = datetime.strptime(oauthExpirationStr, '%Y-%m-%d %H:%M:%S')
-        print 'oauthExpirationDate-' + oauthExpirationDate.__str__()
-        currentTime = datetime.now()
-        delta = currentTime - oauthExpirationDate
-        if(delta.total_seconds() > 0):
-            getRefreshTokenFromApi(tokenResponse['refresh_token'])
-        return False
-    return True
-
-def getToken(code):
-    print 'in getToken'
-    if os.path.exists('./auth-keys'):
-        boxFile = open('./auth-keys', 'r')
-        tokenResponse = {}
-        tokenResponse['access_token'] = boxFile.readline().rstrip()
-        tokenResponse['refresh_token'] = boxFile.readline().rstrip()
-        tokenResponse['expires_in'] = boxFile.readline().rstrip()
-        boxFile.close()
-        print 'expires_in' + tokenResponse['expires_in']
-        oauthExpirationStr = tokenResponse['expires_in'][:19]
-        print 'oauthExpirationStr' + oauthExpirationStr
-        #Format 2013-11-30 03:36:23#
-        oauthExpirationDate = datetime.strptime(oauthExpirationStr, '%Y-%m-%d %H:%M:%S')
-        print 'oauthExpirationDate-' + oauthExpirationDate.__str__()
-        currentTime = datetime.now()
-        delta = currentTime - oauthExpirationDate
-        if(delta.total_seconds() > 0):
-            print 'token expired'
-            tokenResponse = getRefreshTokenFromApi(tokenResponse['refresh_token'])
-    else:
-        tokenResponse = getNewTokenFromApi(code)
-    return tokenResponse
-
-def getAccessToken():
-    accessToken = ''
-    if os.path.exists('./auth-keys'):
-        boxFile = open('./auth-keys', 'r')
-        accessToken = boxFile.readline().rstrip()
-        boxFile.close()
-    return accessToken
+@app.route('/logout')
+def logout():
+    #Call invalidate token api
+    accessToken = session['accessToken']
+    payload = {'access_token':accessToken}
+    INVALIDATE_URL = 'https://www.geni.com/platform/oauth/invalidate_token'
+    invResponse = requests.get(INVALIDATE_URL, params=payload)
+    print invResponse.text
+    session.clear()
+    return send_file('templates/login.html')
+    #return redirect(url_for('/'))
 
 def getNewTokenFromApi(code):
     url = 'https://www.geni.com/platform/oauth/request_token'
@@ -124,48 +83,7 @@ def getNewTokenFromApi(code):
     tokenResponse = requests.get(url, params=params)
     print 'called request token api'
     print tokenResponse.text
-    #tokenResponse = json.dumps(tokenResponse.text)
-    #tokenResponse = json.loads(tokenResponse)
     tokenResponse = tokenResponse.json
-    #tokenResponse = tokenResponse.json()
-    accessToken = tokenResponse['access_token']
-    refreshToken = tokenResponse['refresh_token']
-    tokenExpiration = tokenResponse['expires_in']
-    oauthExpiration= (datetime.now()
-                      + timedelta(seconds=tokenExpiration - 15))
-    boxFile = open('./auth-keys', 'w')
-    boxFile.write(accessToken + '\n')
-    boxFile.write(refreshToken + '\n')
-    boxFile.write(str(oauthExpiration))
-    boxFile.flush()
-    boxFile.close()
-    return tokenResponse
-
-def getRefreshTokenFromApi(refreshToken):
-    url = 'https://www.geni.com/platform/oauth/request_token'
-    params = {
-              'client_id': '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO',
-              'client_secret': '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0',
-              'redirect_url': REDIRECT_URL,
-              'refresh_token': refreshToken,
-              'grant_type': 'refresh_token'
-    }
-    print 'calling refresh token api'
-    tokenResponse = requests.get(url, params=params)
-    print 'called refresh token api'
-    print tokenResponse.text
-    tokenResponse = tokenResponse.json
-    accessToken = tokenResponse.get('access_token')
-    refreshToken = tokenResponse.get('refresh_token')
-    tokenExpiration = tokenResponse.get('expires_in')
-    oauthExpiration= (datetime.now()
-                      + timedelta(seconds=tokenExpiration - 15))
-    boxFile = open('./auth-keys', 'w')
-    boxFile.write(accessToken + '\n')
-    boxFile.write(refreshToken + '\n')
-    boxFile.write(str(oauthExpiration))
-    boxFile.flush()
-    boxFile.close()
     return tokenResponse
 
 if __name__ == '__main__':

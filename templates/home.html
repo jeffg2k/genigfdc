@@ -1,15 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-	<title>Geni Api App Home</title>
-	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-	<script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Gene API Test Application</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/static/css/bootstrap.css" rel="stylesheet">
+
+    <!-- Custom CSS for the 'Thumbnail Gallery' Template -->
+    <link href="/static/css/2-col-portfolio.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="">Gene API Test Application</a>
+            </div>
+
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav pull-right">
+                    <li><a href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
+        </div>
+        <!-- /.container -->
+    </nav>
+
+    <div class="container">
+
+
+        <div class="row">
+
+            <div class="col-lg-6 col-md-6 portfolio-item">
+                <h3><a href="">Your Family</a>
+                </h3>
+                <div id="outputProfile"></div>
+            </div>
+
+            <div class="col-lg-6 col-md-6 portfolio-item">
+                <h3><a href="">Your Ancestors</a>
+                </h3>
+                <p></p>
+            </div>
+
+        </div>
+		<br/><br/><br/>
+		<hr>
+        <footer>
+            <div class="row">
+                <div class="col-lg-12">
+                    <p>Copyright &copy; Company 2014</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+    <!-- /.container -->
+
+    <!-- JavaScript -->
+    <script src="/static/js/jquery-1.10.2.js"></script>
+    <script src="/static/js/bootstrap.js"></script>
+    <script>
 	$(document).ready(function(){
-  	$("#btnGetProfile").click(function(){
 		var inputValue = {};
-		$.each($('#homeForm').serializeArray(), function(i, field) {
-    		inputValue[field.name] = field.value;
-		});
     	$.get("/getProfile", inputValue )
   			.done(function( data ) {
   			data = $.parseJSON(data);
@@ -36,22 +103,10 @@
     				$("#outputProfile").append(item.first_name + " " + item.last_name + "<br/>");
     			}
   			});
-  		});
   	});
 	});
 	</script>
-</head>
-<body align="center">
-	<h1>Geni App Home</h1><br/>
-	--------------------------------<br/>
-	<form id="homeForm">
-		<div>
-			<p><label>Enter Profile Id to get data</label></p>
-			<input id="txtProfileId" name="profileId" type="text"/>&nbsp;&nbsp;
-			<button id="btnGetProfile" type="button">Get profile</button>
-		</div>
-		<br/>
-		<div id="outputProfile"></div>
-	</form>
+
 </body>
+
 </html>
