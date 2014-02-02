@@ -39,9 +39,16 @@ def home():
     tokenResponse = getNewTokenFromApi(code)
     print 'got token!!!!'
     print tokenResponse
+    tokenResponse = json.loads(tokenResponse)
+    print 'got token loaded setting in session'
+    print tokenResponse
+    print tokenResponse['access_token']
     session['accessToken'] = tokenResponse['access_token']
+    print 'session accesstoken'
     session['refreshToken'] = tokenResponse['refresh_token']
+    print 'session refreshtoken'
     session['tokenExpiration'] = tokenResponse['expires_in']
+    print 'sending home html'
     return send_file('templates/home.html')
 
 @app.route('/getProfile', methods=['GET'])
@@ -61,7 +68,6 @@ def getProfile():
 
 @app.route('/logout')
 def logout():
-    #Call invalidate token api
     accessToken = session['accessToken']
     payload = {'access_token':accessToken}
     INVALIDATE_URL = 'https://www.geni.com/platform/oauth/invalidate_token'
@@ -69,7 +75,6 @@ def logout():
     print invResponse.text
     session.clear()
     return send_file('templates/login.html')
-    #return redirect(url_for('/'))
 
 def getNewTokenFromApi(code):
     url = 'https://www.geni.com/platform/oauth/request_token'
@@ -83,12 +88,13 @@ def getNewTokenFromApi(code):
     tokenResponse = requests.get(url, params=params)
     print 'called request token api'
     print tokenResponse.text
-    tokenResponse = tokenResponse.json
+    tokenResponse = tokenResponse.text
+    print 'sending response'
     return tokenResponse
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
-    app.debug = False
+    app.debug = True
     app.secret_key = '12345567890'
     app.run(host='localhost', port=port)
