@@ -9,7 +9,7 @@ app = Flask(__name__)
 
 BASE_URL = 'https://www.geni.com/'
 REDIRECT_URL = 'http://mysterious-citadel-7993.herokuapp.com/home'
-#REDIRECT_URL = 'http://localhost:5000/home'
+#REDIRECT_URL = 'http://localhost:5020/home'
 
 @app.route('/')
 def index():
@@ -37,18 +37,11 @@ def home():
     print 'code-' + code
     print 'expires-' + request.args.get('expires_in')
     tokenResponse = getNewTokenFromApi(code)
-    print 'got token!!!!'
     print tokenResponse
     tokenResponse = json.loads(tokenResponse)
-    print 'got token loaded setting in session'
-    print tokenResponse
-    print tokenResponse['access_token']
     session['accessToken'] = tokenResponse['access_token']
-    print 'session accesstoken'
     session['refreshToken'] = tokenResponse['refresh_token']
-    print 'session refreshtoken'
     session['tokenExpiration'] = tokenResponse['expires_in']
-    print 'sending home html'
     return send_file('templates/home.html')
 
 @app.route('/getProfile', methods=['GET'])

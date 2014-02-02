@@ -58,7 +58,7 @@
             </div>
 
         </div>
-		<br/><br/><br/>
+		<br/>
 		<hr>
         <footer>
             <div class="row">
@@ -83,26 +83,26 @@
     		//$("#outputProfile").append(data);
     		$("#outputProfile").append("<b>User Profile</b>");
     		$("#outputProfile").append("<br/>");
-    		$("#outputProfile").append("============");
-    		$("#outputProfile").append("<br/>");
-    		$("#outputProfile").append("ProfileId : ").append(data.focus.id);
-    		$("#outputProfile").append("<br/>");
-    		$("#outputProfile").append("Name : ").append(data.focus.first_name + " " + data.focus.last_name);
-    		$("#outputProfile").append("<br/>");
-    		$("#outputProfile").append("Gender : ").append(data.focus.gender);
-    		$("#outputProfile").append("<br/>");
-    		$("#outputProfile").append("URL : ").append(data.focus.url);
+    		$("#outputProfile").append("<table border='1'>");
+    		$("#outputProfile").append("<tr><td>ProfileId</td>").
+    			append("<td>").append(data.focus.id).append("</td></tr>");
+    		$("#outputProfile").append("<tr><td>Name</td>").append("<td>").
+    			append(data.focus.first_name + " " + data.focus.last_name).append("</td></tr>");
+    		$("#outputProfile").append("<tr><td>Gender</td>").append("<td>").
+    			append(data.focus.gender).append("</td></tr>");
+    		$("#outputProfile").append("<tr><td>URL</td>").append("<td>").
+    			append(data.focus.url).append("</td></tr></table>");
     		$("#outputProfile").append("<br/><br/>");
     		$("#outputProfile").append("<b>Relations</b>");
-    		$("#outputProfile").append("<br/>");
-			$("#outputProfile").append("=========");
-			$("#outputProfile").append("<br/>");
+			$("#outputProfile").append("<table border='1'>");
 			//Relations
 			$.each(data.nodes, function(i, item) {
 				if(item.id) {
-    				$("#outputProfile").append(item.first_name + " " + item.last_name + "<br/>");
+    				$("#outputProfile").append("<tr><td>").
+    				append(item.first_name + " " + item.last_name + "</td></tr>");
     			}
   			});
+  			$("#outputProfile").append("</table>");
   	});
 	});
 	</script>
