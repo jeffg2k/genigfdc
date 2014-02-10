@@ -54,6 +54,8 @@ def logout():
     session.clear()
     return send_file('templates/login.html')
 
+app.secret_key = '12345abcde'
+
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
     port = int(os.environ.get('PORT', 5000))
