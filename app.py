@@ -4,7 +4,7 @@ import requests
 from datetime import datetime, timedelta
 import json
 import requests
-from geniClient import buildAuthUrl, getNewToken, invalidateToken, getFamilyDetails
+from geniClient import buildAuthUrl, getNewToken, invalidateToken, getProfileDetails, getImmFamilyDetails
 
 app = Flask(__name__)
 
@@ -43,8 +43,19 @@ def getProfile():
     accessToken = session['accessToken']
     if not accessToken:
         redirect(url_for('login'))
-    profileResponse = getFamilyDetails(accessToken)
-    print profileResponse
+    profileResponse = getProfileDetails(accessToken)
+    #print profileResponse
+    return profileResponse
+
+@app.route('/getImmFamily', methods=['GET'])
+def getImmFamily():
+    print 'in /getImmFamily'
+    profileId = request.args.get('profileId')
+    accessToken = session['accessToken']
+    if not accessToken:
+        redirect(url_for('login'))
+    profileResponse = getImmFamilyDetails(accessToken, profileId)
+    #print profileResponse
     return profileResponse
 
 @app.route('/logout')

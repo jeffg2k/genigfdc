@@ -45,16 +45,10 @@
 
         <div class="row">
 
-            <div class="col-lg-6 col-md-6 portfolio-item">
+            <div class="col-lg-6 col-lg-6 portfolio-item">
                 <h3><a href="">Your Family</a>
                 </h3>
                 <div id="outputProfile"></div>
-            </div>
-
-            <div class="col-lg-6 col-md-6 portfolio-item">
-                <h3><a href="">Your Ancestors</a>
-                </h3>
-                <p></p>
             </div>
 
         </div>
@@ -99,7 +93,8 @@
 			$.each(data.nodes, function(i, item) {
 				if(item.id) {
     				$("#outputProfile").append("<tr><td>").
-    				append(item.first_name + " " + item.last_name + "</td></tr>");
+    				append(item.first_name + " " + item.last_name + "</td>").
+    				append("<td>" + item.id + "</td></tr>");
     			}
   			});
   			$("#outputProfile").append("</table>");

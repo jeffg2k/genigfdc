@@ -7,8 +7,9 @@ AUTH_URL = 'platform/oauth/authorize'
 CLIENT_ID = '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO'
 CLIENT_SECRET = '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0'
 TOKEN_URL = 'https://www.geni.com/platform/oauth/request_token'
-FAM_URL = 'https://www.geni.com/api/profile/immediate-family'
-PROF_URL = 'https://www.geni.com/api/profile'
+PROF_URL = 'https://www.geni.com/api/profile/immediate-family'
+IMM_FAM_URL = 'https://www.geni.com/api/?/immediate-family'
+#PROF_URL = 'https://www.geni.com/api/profile'
 INVALIDATE_URL = 'https://www.geni.com/platform/oauth/invalidate_token'
 
 def buildAuthUrl():
@@ -36,9 +37,16 @@ def getNewToken(code):
     print 'sending response'
     return tokenResponse
 
-def getFamilyDetails(accessToken):
+def getProfileDetails(accessToken):
     payload = {'access_token':accessToken}
-    profileResponse = requests.get(FAM_URL, params=payload)
+    profileResponse = requests.get(PROF_URL, params=payload)
+    print profileResponse.text
+    return profileResponse.text
+
+def getImmFamilyDetails(accessToken, profileId):
+    payload = {'access_token':accessToken}
+    url = IMM_FAM_URL.replace('?', profileId)
+    profileResponse = requests.get(url, params=payload)
     print profileResponse.text
     return profileResponse.text
 
