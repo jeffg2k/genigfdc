@@ -45,8 +45,14 @@ def getProfile():
     if not accessToken:
         redirect(url_for('login'))
     profileObj = getProfileDetails(accessToken)
+    print 'got profileObj'
+    print profileObj.id
     if profileObj != None:
+        print 'inside if'
         session[profileObj.id] = profileObj
+        print 'session obj set'
+    print 'sending json'
+    print profileObj.toJson()
     return profileObj.toJson()
 
 @app.route('/getImmFamily', methods=['GET'])
