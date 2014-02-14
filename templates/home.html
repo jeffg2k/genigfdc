@@ -73,31 +73,9 @@
 		var inputValue = {};
     	$.get("/getProfile", inputValue )
   			.done(function( data ) {
-  			data = $.parseJSON(data);
-    		//$("#outputProfile").append(data);
-    		$("#outputProfile").append("<b>User Profile</b>");
-    		$("#outputProfile").append("<br/>");
-    		$("#outputProfile").append("<table border='1'>");
-    		$("#outputProfile").append("<tr><td>ProfileId</td>").
-    			append("<td>").append(data.focus.id).append("</td></tr>");
-    		$("#outputProfile").append("<tr><td>Name</td>").append("<td>").
-    			append(data.focus.first_name + " " + data.focus.last_name).append("</td></tr>");
-    		$("#outputProfile").append("<tr><td>Gender</td>").append("<td>").
-    			append(data.focus.gender).append("</td></tr>");
-    		$("#outputProfile").append("<tr><td>URL</td>").append("<td>").
-    			append(data.focus.url).append("</td></tr></table>");
-    		$("#outputProfile").append("<br/><br/>");
-    		$("#outputProfile").append("<b>Relations</b>");
-			$("#outputProfile").append("<table border='1'>");
-			//Relations
-			$.each(data.nodes, function(i, item) {
-				if(item.id) {
-    				$("#outputProfile").append("<tr><td>").
-    				append(item.first_name + " " + item.last_name + "</td>").
-    				append("<td>" + item.id + "</td></tr>");
-    			}
-  			});
-  			$("#outputProfile").append("</table>");
+  			//data = $.parseJSON(data);
+    		var div = document.getElementById('outputProfile');
+			div.innerHTML = div.innerHTML + data;
   	});
 	});
 	</script>

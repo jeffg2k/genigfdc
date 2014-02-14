@@ -27,6 +27,7 @@ def home():
     print tokenResponse
     setTokens(tokenResponse)
     return send_file('templates/home.html')
+    #return send_file('templates/index.html')
 
 def setTokens(tokenResponse):
     tokenResponse = json.loads(tokenResponse)
@@ -43,9 +44,10 @@ def getProfile():
     accessToken = session['accessToken']
     if not accessToken:
         redirect(url_for('login'))
-    profileResponse = getProfileDetails(accessToken)
-    #print profileResponse
-    return profileResponse
+    profileObj = getProfileDetails(accessToken)
+    if profileObj != None:
+        session[profileObj.id] = profileObj
+    return profileObj.toJson()
 
 @app.route('/getImmFamily', methods=['GET'])
 def getImmFamily():
@@ -54,9 +56,18 @@ def getImmFamily():
     accessToken = session['accessToken']
     if not accessToken:
         redirect(url_for('login'))
-    profileResponse = getImmFamilyDetails(accessToken, profileId)
-    #print profileResponse
-    return profileResponse
+    try:
+        if session[profileId] != None:
+            profileObj = session[profileId]
+            print 'loaded from session================'
+            return profileObj.toJson()
+    except KeyError:
+        pass
+    profileObj = getImmFamilyDetails(accessToken, profileId)
+    if profileObj != None:
+        session[profileObj.id] = profileObj
+    #print profileObj.toJson()
+    return profileObj.toJson()
 
 @app.route('/logout')
 def logout():
