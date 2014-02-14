@@ -26,7 +26,7 @@ def home():
     tokenResponse = getNewToken(code)
     print tokenResponse
     setTokens(tokenResponse)
-    return send_file('templates/home2.html')
+    return send_file('templates/home.html')
     #return send_file('templates/index.html')
 
 def setTokens(tokenResponse):
