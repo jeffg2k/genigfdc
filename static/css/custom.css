@@ -1,0 +1,16 @@
+body{background:url('../images/backgroundImgs/subtle_dots.png') repeat;}	/*http://subtlepatterns.com/subtle-dots/*/
+#pageContent .relations .col-xs-4{width: 30%; margin-right:2%}
+#pageContent p{font-size: 14px;}
+a.panel-title{font-weight: bold;} 
+a.panel-title:hover{color: #16a085}
+a.panel-title:hover{text-decoration:underline}
+.relations a.panel-title:hover{color: #FFF}
+.male{color: #16a085}
+.female{color: #428bca}
+.recentProfile{float: left; margin-bottom: 10px;}
+.relations .panel-heading{padding: 0px 15px}
+.zeroProfiles{font-size: 14px;cursor:default}
+.relations p, .zeroMargin{margin: 0}
+h5.rsvp{font-size: 15px;margin-top: 0; margin-bottom:10px; color:#3c763d }
+.rsvpContainer .label{padding: 10px 40px}
+footer{background-color:transparent !important; text-align:center;color: #3c763d !important}

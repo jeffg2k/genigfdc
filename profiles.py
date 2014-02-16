@@ -1,12 +1,12 @@
 import json
 
-class Relation:
+class Relation(object):
     def __init__(self, name, gender, id):
         self.name = name
         self.id = id
         self.gender = gender
 
-class Profile:
+class Profile(object):
     relations = []
     def __init__(self, id, geniLink, name, relations, gender):
         self.id = id
@@ -18,4 +18,4 @@ class Profile:
         r = Relation(name, gender, id)
         self.relations.append(r)
     def toJson(self):
-        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True, indent=4)
+        return json.dumps(self, default=lambda o: o.__dict__, sort_keys=True)

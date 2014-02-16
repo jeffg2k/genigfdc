@@ -3,8 +3,8 @@ import json
 from profiles import Relation, Profile
 
 BASE_URL = 'https://www.geni.com/'
-REDIRECT_URL = 'http://mysterious-citadel-7993.herokuapp.com/home'
-#REDIRECT_URL = 'http://localhost:5000/home'
+#REDIRECT_URL = 'http://mysterious-citadel-7993.herokuapp.com/home'
+REDIRECT_URL = 'http://localhost:5000/home'
 AUTH_URL = 'platform/oauth/authorize'
 CLIENT_ID = '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO'
 CLIENT_SECRET = '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0'
@@ -32,17 +32,18 @@ def getNewToken(code):
               'code': code,
               'redirect_url': REDIRECT_URL
     }
-    print 'calling request token api'
     tokenResponse = requests.get(TOKEN_URL, params=params)
-    print 'called request token api'
-    #print tokenResponse.text
     tokenResponse = tokenResponse.text
-    print 'sending response'
+    print 'got access tokens'
     return tokenResponse
 
-def getProfileDetails(accessToken):
+def getProfileDetails(accessToken, profileId):
     payload = {'access_token':accessToken}
-    profileResponse = requests.get(PROF_URL, params=payload)
+    if not profileId:
+        profileResponse = requests.get(PROF_URL, params=payload)
+    else:
+        url = IMM_FAM_URL.replace('?', profileId)
+        profileResponse = requests.get(url, params=payload)
     profileObj = getProfileObj(profileResponse.text)
     return profileObj
 
@@ -60,15 +61,24 @@ def getProfileObj(profileResponse):
     publicUrl = PUBLIC_URL
     publicUrl = publicUrl.replace('{name}', firstName + '-' + lastName)
     publicUrl = publicUrl.replace('{guid}', jsoncontents['focus']['guid'])
-    p = Profile(jsoncontents['focus']['id'], publicUrl,
-            firstName + ' ' + lastName, [], jsoncontents['focus']['gender'])
+    #p = Profile(jsoncontents['focus']['id'], publicUrl,
+    #        firstName + ' ' + lastName, [], jsoncontents['focus']['gender'])
+    data = {}
+    data['id'] = jsoncontents['focus']['id']
+    data['name'] = firstName + ' ' + lastName
+    data['gender'] = jsoncontents['focus']['gender']
+    data['geniLink'] = publicUrl
     contents = jsoncontents['nodes']
+    relations = []
     for node in contents:
         if node.startswith('profile') and jsoncontents['focus']['id'] != contents[node]['id']:
-            p.addRelation(contents[node]['first_name'] + ' ' + contents[node]['last_name'],
-                      contents[node]['gender'], contents[node]['id'])
-
-    return p
+            #p.addRelation(contents[node]['first_name'] + ' ' + contents[node]['last_name'],
+            #          contents[node]['gender'], contents[node]['id'])
+            relations.append({'id':contents[node]['id'],
+                              'name':contents[node]['first_name'] + ' ' + contents[node]['last_name'],
+                              'gender':contents[node]['gender']})
+    data['relations'] = relations
+    return data
 
 def invalidateToken(accessToken):
     payload = {'access_token':accessToken}
