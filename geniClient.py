@@ -3,8 +3,8 @@ import json
 from profiles import Relation, Profile
 
 BASE_URL = 'https://www.geni.com/'
-REDIRECT_URL = 'http://mysterious-citadel-7993.herokuapp.com/home'
-#REDIRECT_URL = 'http://localhost:5000/home'
+#REDIRECT_URL = 'http://mysterious-citadel-7993.herokuapp.com/home'
+REDIRECT_URL = 'http://localhost:5000/home'
 AUTH_URL = 'platform/oauth/authorize'
 CLIENT_ID = '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO'
 CLIENT_SECRET = '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0'

@@ -6,8 +6,16 @@ import json
 import requests
 from geniClient import buildAuthUrl, getNewToken, invalidateToken, getProfileDetails, getImmFamilyDetails
 from profiles import Relation, Profile
+from simplekv.memory import DictStore
+from flaskext.kvsession import KVSessionExtension
 
 app = Flask(__name__)
+
+# a DictStore will store everything in memory
+store = DictStore()
+
+# this will replace the app's session handling
+KVSessionExtension(store, app)
 
 @app.route('/')
 def index():
@@ -27,6 +35,7 @@ def home():
     tokenResponse = getNewToken(code)
     print tokenResponse
     setTokens(tokenResponse)
+    session['currentStep'] = 0
     return send_file('templates/index.html')
 
 def setTokens(tokenResponse):
@@ -56,6 +65,9 @@ def getProfile():
         pass
 
     profileData = getProfileDetails(accessToken, profileId)
+    if profileId == None:
+        session['loginProfileId'] = profileData['id']
+    #session[profileData['id']] = profileData
     print 'got profileObj'
     print profileData['id']
     if profileData != None:
@@ -66,6 +78,54 @@ def getProfile():
     print 'returning json'
     print profileData
     return jsonify(profileData)
+
+@app.route('/getUniqueCount')
+def getUniqueCount():
+    print 'in /getUniqueCount'
+    uniqueCount = 0
+    nextStepProfiles = ''
+    currentStep = session['currentStep']
+    if currentStep == 0:
+        loginProfileId = session['loginProfileId']
+        profileData = session[loginProfileId]
+        session['visited-' + loginProfileId] = True
+        for node in profileData['relations']:
+            uniqueCount = uniqueCount + 1
+            nextStepProfiles = nextStepProfiles + '*' + node['id']  # *** delimiter
+            session['visited-' + node['id']] = True
+
+        session['nextStepProfiles'] = nextStepProfiles[1:]
+    else:
+        print '====more profile steps===='
+        nextStepProfiles = session['nextStepProfiles']
+        profileIds = nextStepProfiles.split('*')
+        nextStepProfiles = ''
+        for profileId in profileIds:
+            try:
+                if session[profileId] != None:
+                    profileData = session[profileId]
+                    print '===loaded from session================'
+            except KeyError:
+                profileData = getProfileDetails(session['accessToken'], profileId)
+            #Got profile data, process each relation
+            session[profileData['id']] = profileData
+            for node in profileData['relations']:
+                nodeId = node['id']
+                try:
+                    if session['visited-' + nodeId] == True:
+                        pass
+                except KeyError:
+                    nextStepProfiles = nextStepProfiles + '*' + node['id']
+                    uniqueCount = uniqueCount + 1
+                    session['visited-' + node['id']] = True
+        session['nextStepProfiles'] = nextStepProfiles[1:]
+
+    print '====profiles step done===='
+    print 'currentStep-' + str(currentStep)
+        #Get unique counts here
+    currentStep = currentStep + 1
+    session['currentStep'] = currentStep
+    return jsonify({'step':currentStep, 'uniqueCount':uniqueCount})
 
 """@app.route('/getImmFamily', methods=['GET'])
 def getImmFamily():
