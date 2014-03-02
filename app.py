@@ -86,6 +86,9 @@ def getUniqueCount():
     nextStepProfiles = ''
     currentStep = session['currentStep']
     if currentStep == 0:
+        profileData = getProfileDetails(session['accessToken'], None)
+        session['loginProfileId'] = profileData['id']
+        session[profileData['id']] = profileData
         loginProfileId = session['loginProfileId']
         profileData = session[loginProfileId]
         session['visited-' + loginProfileId] = True
@@ -95,8 +98,8 @@ def getUniqueCount():
             session['visited-' + node['id']] = True
 
         session['nextStepProfiles'] = nextStepProfiles[1:]
+        session['totalProfiles'] = uniqueCount
     else:
-        print '====more profile steps===='
         nextStepProfiles = session['nextStepProfiles']
         profileIds = nextStepProfiles.split('*')
         nextStepProfiles = ''
@@ -104,7 +107,6 @@ def getUniqueCount():
             try:
                 if session[profileId] != None:
                     profileData = session[profileId]
-                    print '===loaded from session================'
             except KeyError:
                 profileData = getProfileDetails(session['accessToken'], profileId)
             #Got profile data, process each relation
@@ -119,13 +121,11 @@ def getUniqueCount():
                     uniqueCount = uniqueCount + 1
                     session['visited-' + node['id']] = True
         session['nextStepProfiles'] = nextStepProfiles[1:]
-
-    print '====profiles step done===='
+        session['totalProfiles'] = session['totalProfiles'] + uniqueCount
     print 'currentStep-' + str(currentStep)
-        #Get unique counts here
     currentStep = currentStep + 1
     session['currentStep'] = currentStep
-    return jsonify({'step':currentStep, 'uniqueCount':uniqueCount})
+    return jsonify({'step':currentStep, 'uniqueCount':uniqueCount, 'total':session['totalProfiles']})
 
 """@app.route('/getImmFamily', methods=['GET'])
 def getImmFamily():

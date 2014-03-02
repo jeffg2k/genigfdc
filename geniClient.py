@@ -74,9 +74,12 @@ def getProfileObj(profileResponse):
         if node.startswith('profile') and jsoncontents['focus']['id'] != contents[node]['id']:
             #p.addRelation(contents[node]['first_name'] + ' ' + contents[node]['last_name'],
             #          contents[node]['gender'], contents[node]['id'])
-            relations.append({'id':contents[node]['id'],
+            try:
+                relations.append({'id':contents[node]['id'],
                               'name':contents[node]['first_name'] + ' ' + contents[node]['last_name'],
                               'gender':contents[node]['gender']})
+            except:
+                pass
     data['relations'] = relations
     return data
 

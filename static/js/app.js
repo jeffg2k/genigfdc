@@ -10,8 +10,12 @@ geniframework.config(['$routeProvider', function($routeProvider){
 		templateUrl : '../../static/partials/unique.html',
 		controller : UniqueController
 	});
+	$routeProvider.when('/top', {
+		templateUrl : '../../static/partials/top.html',
+		controller : TopController
+	});
 	$routeProvider.otherwise({
-    	redirectTo : '/home'
+    	redirectTo : '/unique'
 	});
 }]);
 
@@ -58,23 +62,21 @@ function HomeController($scope,$rootScope, $http){
 
 function UniqueController($scope,$rootScope, $http){
     var httpPromise = $http;
-    //var profileAPI = '/static/js/json/profile.js';
     var profileAPI = '/getUniqueCount';
     callServerGETAPI(httpPromise, profileAPI, setResponse);
 
-    //$scope.recentProfiles = [];
-
+    $scope.uniqueProfileData = [];
     function setResponse(responseData){
-        $scope.stepData = responseData;
-        //$scope.stepData.push(responseData);
-        //var profileObj = {"id" : $scope.profileId, "name" : $scope.profileName}
+        $scope.uniqueProfileData.push(responseData);
     }
 
     $scope.getUniqueCount = function(){
-        //var profileAPI = '/static/js/json/' + id+'.js';
-        var profileAPI = '/getUniqueCount';
         callServerGETAPI(httpPromise, profileAPI, setResponse);
     }
+
+}
+
+function TopController($scope,$rootScope, $http){
 }
 
 function callServerGETAPI(httpPromise, apiName, reponseHandler){

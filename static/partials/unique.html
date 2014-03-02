@@ -1,8 +1,17 @@
-<div ng-controller="UniqueController">
-	<a href='javascript:void(0)' class="label label-info recentProfile"
-    	ng-click="getUniqueCount()">Get next level profiles</a>
-	<div class="panel-body">
-        Step: <span>{{stepData.step}}</span></p>
-        Unique Profiles Count: <span>{{stepData.uniqueCount}}</span></p>
+<div id='uniqueProfiles' ng-controller='UniqueController'>
+    <h5 style='font-size: 20px;margin-top: 0'>Unique Profiles</h5>
+    <div class='row'>
+        <div class='col-xs-3'>
+            <a href='javascript:void(0)' class="label label-info recentProfile"
+                           ng-click="getUniqueCount()">Get Next Level Profiles</a>
+        </div>
+        <div class='col-xs-9 row'>
+            <div class='well col-xs-4' ng-repeat='data in uniqueProfileData'>
+                <p>Step: {{data.step}}</p>
+                <p>Profiles: {{data.uniqueCount}}</p>
+                <p>Total: {{data.total}}</p>
+            </div>
+        </div>
+
     </div>
 </div>
