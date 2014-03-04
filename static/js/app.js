@@ -19,6 +19,31 @@ geniframework.config(['$routeProvider', function($routeProvider){
 	});
 }]);
 
+geniframework.config(function ($httpProvider) {
+	$httpProvider.responseInterceptors.push('myHttpInterceptor');
+	var spinnerFunction = function (data, headersGetter) {
+		$('#loading').show();
+    	return data;
+    };
+    $httpProvider.defaults.transformRequest.push(spinnerFunction);
+})
+// register the interceptor as a service, intercepts ALL angular ajax http calls
+	.factory('myHttpInterceptor', function ($q, $window) {
+        return function (promise) {
+            return promise.then(function (response) {
+                // do something on success
+                // todo hide the spinner
+                $('#loading').hide();
+                return response;
+            }, function (response) {
+                // do something on error
+                // todo hide the spinner
+                $('#loading').hide();
+                return $q.reject(response);
+            });
+        };
+});
+
 function HomeController($scope,$rootScope, $http){
     var httpPromise = $http;
     //var profileAPI = '/static/js/json/profile.js';
@@ -42,7 +67,7 @@ function HomeController($scope,$rootScope, $http){
         callServerGETAPI(httpPromise, profileAPI, procesSearch);
         if($scope.recentProfiles.length === 0){
             var profileObj = {"id" : $scope.profileId, "name" : $scope.profileName}
-            $scope.recentProfiles.push(profileObj);
+            $scope.push(profileObj);
         }else{
           var count = 0;
             var profileObj = {"id" : $scope.profileId, "name" : $scope.profileName};
@@ -67,7 +92,9 @@ function UniqueController($scope,$rootScope, $http){
 
     $scope.uniqueProfileData = [];
     function setResponse(responseData){
-        $scope.uniqueProfileData.push(responseData);
+    	if(responseData.uniqueCount>0) {
+        	$scope.uniqueProfileData.push(responseData);
+        }
     }
 
     $scope.getUniqueCount = function(){
