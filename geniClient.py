@@ -1,19 +1,21 @@
+import os
 import requests
 import json
 from profiles import Relation, Profile
 
 BASE_URL = 'https://www.geni.com/'
-REDIRECT_URL = 'http://gfdc.herokuapp.com/home'
-#REDIRECT_URL = 'http://localhost:5000/home'
+#REDIRECT_URL = 'http://gfdc.herokuapp.com/home'
+REDIRECT_URL = os.getenv('GENI_REDIRECT_URL','http://localhost:5000/home')
 AUTH_URL = 'platform/oauth/authorize'
-CLIENT_ID = '0FxhNjhtYXRPKRqDBOCJgJOhukrg1xIACIZr0LZO'
-CLIENT_SECRET = '0t72HNiBHuNCGhnD2Y7a9zu65lJaomls4UPXJCe0'
+CLIENT_ID = os.getenv('GENI_CLIENT_ID', '')
+CLIENT_SECRET = os.getenv('GENI_CLIENT_SECRET', '')
 TOKEN_URL = 'https://www.geni.com/platform/oauth/request_token'
 PROF_URL = 'https://www.geni.com/api/profile/immediate-family'
 IMM_FAM_URL = 'https://www.geni.com/api/?/immediate-family'
 #PROF_URL = 'https://www.geni.com/api/profile'
 INVALIDATE_URL = 'https://www.geni.com/platform/oauth/invalidate_token'
 PUBLIC_URL = 'http://www.geni.com/people/{name}/{guid}'
+OTHERS_URL = 'https://www.geni.com/api/profile-G{guid}'
 
 def buildAuthUrl():
     params = {
@@ -34,7 +36,6 @@ def getNewToken(code):
     }
     tokenResponse = requests.get(TOKEN_URL, params=params)
     tokenResponse = tokenResponse.text
-    print 'got access tokens'
     return tokenResponse
 
 def getProfileDetails(accessToken, profileId):
@@ -47,12 +48,11 @@ def getProfileDetails(accessToken, profileId):
     profileObj = getProfileObj(profileResponse.text)
     return profileObj
 
-def getImmFamilyDetails(accessToken, profileId):
+def getOtherProfile(accessToken, guid):
     payload = {'access_token':accessToken}
-    url = IMM_FAM_URL.replace('?', profileId)
+    url = OTHERS_URL.replace('{guid}', guid)
     profileResponse = requests.get(url, params=payload)
-    profileObj = getProfileObj(profileResponse.text)
-    return profileObj
+    return profileResponse.text
 
 def getProfileObj(profileResponse):
     jsoncontents = json.loads(profileResponse)
@@ -86,4 +86,3 @@ def getProfileObj(profileResponse):
 def invalidateToken(accessToken):
     payload = {'access_token':accessToken}
     invResponse = requests.get(INVALIDATE_URL, params=payload)
-    print invResponse.text

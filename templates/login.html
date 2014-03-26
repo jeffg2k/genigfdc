@@ -1,10 +1,14 @@
 <!doctype html>
 <html>
     <head>
-         <title>Geni Login</title>
-         <link href="/static/css/flat-ui.css" rel="stylesheet">
-         <link href="/static/css/demo.css" rel="stylesheet">
+         <title>Geni Forest Density Calculator Login</title>
          <link href="/static/css/bootstrap.css" rel="stylesheet">
+         <link href="/static/css/demo.css" rel="stylesheet">
+        <link href="/static/css/flat-ui.css" rel="stylesheet">
+        <link href="/static/css/custom.css" rel="stylesheet">
+        <script src="/static/js/lib/jquery-1.8.3.min.js"></script>
+        <script src="/static/js/lib/bootstrap.min.js"></script>
+
         <style type="text/css">
             body{background:url('/static/images/backgroundImgs/subtle_dots.png') repeat;}
         </style>
@@ -26,28 +30,46 @@
                         <div class='col-xs-6'>
                             <div class="collapse navbar-collapse" id="navbar-collapse-01">
                               <ul class="nav navbar-nav navbar-right">
-                                <li><a href="/login">Login</a></li>
-                                <li><a href="/contact">Contact</a></li>
+                                  <li><a href="/login">Login</a></li>
+                              <li><a href="javascript:" data-toggle="modal"
+                                       data-target="#contactForm">Contact</a></li>
                                </ul>
                             </div>
                         </div>
                     </nav>
-                    <p>Geni.com’s <a href='http://www.geni.com/worldfamilytree'>World Family Tree</a> is a
+                    <p>Geni.com <a href='http://www.geni.com/worldfamilytree' target="blank">World Family Tree</a> is a
                     unique collaborative, largely public collection of connected family trees.
                     The Geni Forest Density Calculator (GFDC) is designed to test the density of
                     the forest surrounding a profile.  The density at a particular profile node is
                     calculated as the number of unique profile nodes within n steps of the node.
                     All members of a node’s immediate family (parents, siblings, spouse/partner,
-                    and children) are defined as one step away from the node.<br/>
-                    Please note that the GFDC may be limited by privacy settings or
+                    and children) are defined as one step away from the node.</p>
+                    <p>Please note that the GFDC may be limited by privacy settings or
                    	by anomalies in the Geni database.</p>
-                   	<br/><br/><br/><br/><br/><br/><br/><br/>
                 </div>
             </div>
-			<footer>
-      			<hr />
-      			<p class=''><strong>&copy; Geni Forest Density Calculator</strong></p>
-			</footer>
+            <div class="modal fade" id="contactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="contactFormLabel">Contact us</h4>
+                      </div>
+                      <div class="modal-body">
+                        <script type="text/javascript" src="http://form.jotform.us/jsform/40618781407154"></script>
+                      </div>
+                      <!--<div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>-->
+                    </div>
+                  </div>
+                </div>
+            <footer>
+                <hr />
+                <p class=''><strong>&copy; GFDC</strong></p>
+            </footer>
         </div>
     </body>
 </html>

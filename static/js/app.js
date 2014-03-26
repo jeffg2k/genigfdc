@@ -6,68 +6,43 @@ geniframework.config(['$routeProvider', function($routeProvider){
 		templateUrl : '../../static/partials/home.html',
 		controller : HomeController
 	});
-	$routeProvider.when('/unique', {
+    $routeProvider.when('/unique', {
 		templateUrl : '../../static/partials/unique.html',
 		controller : UniqueController
 	});
-	$routeProvider.when('/top', {
+    $routeProvider.when('/top50', {
 		templateUrl : '../../static/partials/top.html',
-		controller : TopController
+		controller : Top50Controller
 	});
 	$routeProvider.otherwise({
     	redirectTo : '/unique'
 	});
 }]);
 
-geniframework.config(function ($httpProvider) {
-	$httpProvider.responseInterceptors.push('myHttpInterceptor');
-	var spinnerFunction = function (data, headersGetter) {
-		$('#loading').show();
-    	return data;
-    };
-    $httpProvider.defaults.transformRequest.push(spinnerFunction);
-})
-// register the interceptor as a service, intercepts ALL angular ajax http calls
-	.factory('myHttpInterceptor', function ($q, $window) {
-        return function (promise) {
-            return promise.then(function (response) {
-                // do something on success
-                // todo hide the spinner
-                $('#loading').hide();
-                return response;
-            }, function (response) {
-                // do something on error
-                // todo hide the spinner
-                $('#loading').hide();
-                return $q.reject(response);
-            });
-        };
-});
-
 function HomeController($scope,$rootScope, $http){
     var httpPromise = $http;
-    //var profileAPI = '/static/js/json/profile.js';
     var profileAPI = '/getProfile';
+    $scope.loading = true;
     callServerGETAPI(httpPromise, profileAPI, procesSearch);
 
     $scope.recentProfiles = [];
 
     function procesSearch(responseData){
+        $scope.loading = false;
+        $('.loadingMask').hide();
         $scope.profileData = responseData;
         $scope.profileId = $scope.profileData.id;
         $scope.profileName = $scope.profileData.name;
     }
 
     $scope.getProfile = function(id, name){
-        //var profileAPI = '/static/js/json/' + id+'.js';
-        var profileAPI = '/getProfile';
-        if(id!=null) {
-			profileAPI = profileAPI + '?profileId=' + id;
-        }
+        var profileAPI = 'js/json/' + id+'.js';
+        $scope.loading = true;
+        $('.loadingMask').show();
         callServerGETAPI(httpPromise, profileAPI, procesSearch);
         if($scope.recentProfiles.length === 0){
             var profileObj = {"id" : $scope.profileId, "name" : $scope.profileName}
-            $scope.push(profileObj);
+            $scope.recentProfiles.push(profileObj);
         }else{
           var count = 0;
             var profileObj = {"id" : $scope.profileId, "name" : $scope.profileName};
@@ -85,27 +60,116 @@ function HomeController($scope,$rootScope, $http){
     }
 }
 
-function UniqueController($scope,$rootScope, $http){
+var UniqueController = function($scope,$rootScope, $http){
     var httpPromise = $http;
-    var profileAPI = '/getUniqueCount';
-    callServerGETAPI(httpPromise, profileAPI, setResponse);
+    /*$scope.loading = true;
+    $('.loadingMask').show();
+    var onloadProfileData = 'js/json/onloadProfileCountJSON.js';
+    var me = this;
+    callServerGETAPI(httpPromise, onloadProfileData, loadProfileData);
 
-    $scope.uniqueProfileData = [];
-    function setResponse(responseData){
-    	if(responseData.uniqueCount>0) {
-        	$scope.uniqueProfileData.push(responseData);
+    function loadProfileData(responseData){
+        $scope.loading = false;
+        $('.loadingMask').hide();
+      $scope.isProfileExists = responseData.profileId;
+      if(angular.isUndefined($scope.isProfileExists)){
+            $scope.showUserProfile = true;
+            $scope.myProfileData = responseData;
+            $('#uniqueProfilesTab a[href="#profile"]').tab('show');
+      }else{
+            $scope.showUserProfile = false;
+            $scope.otherProfileData = responseData;
+            $('#uniqueProfilesTab a[href="#otherProfile"]').tab('show');
+      }
+    }*/
+    $('#uniqueProfilesTab a[href="#profile"]').tab('show');
+    $scope.showTableDataMyProfile = false;
+    $scope.showTableDataOtherProfile = false;
+    $scope.submitMyProfile = function(formId){
+        var getFormData = $(formId).serialize();
+        $rootScope.formId = formId;
+        var submiProfileAPI = '/getUniqueCount?'+getFormData;
+        if($rootScope.formId === '#myProfileForm'){
+           if($scope.myProfileForm.stepValue < 4){
+                if($scope.myProfileForm.stepValue !== ''){
+                    $scope.loading = true;
+                    $('.loadingMask').show();
+                    callServerGETAPI(httpPromise, submiProfileAPI, showTableData);
+                }
+           }else{
+                if(($scope.myProfileForm.stepValue !== '') && ($scope.myProfileForm.emailField !== '')
+                   && ($scope.myProfileForm.email.$valid)){
+                    $scope.loading = true;
+                    $('.loadingMask').show();
+                    callServerGETAPI(httpPromise, submiProfileAPI, showTableData);
+                }
+           }
+        }else{
+            if($scope.otherProfileForm.stepValue < 4){
+                if($scope.otherProfileForm.stepValue !== ''){
+                    $scope.loading = true;
+                    $('.loadingMask').show();
+                    callServerGETAPI(httpPromise, submiProfileAPI, showTableData);
+                }
+            }else{
+                if(($scope.otherProfileForm.stepValue !== '') && ($scope.otherProfileForm.emailField !== '')
+                   && ($scope.otherProfileForm.email.$valid)){
+                    $scope.loading = true;
+                    $('.loadingMask').show();
+                    callServerGETAPI(httpPromise, submiProfileAPI, showTableData);
+                }
+            }
         }
     }
 
-    $scope.getUniqueCount = function(){
-        callServerGETAPI(httpPromise, profileAPI, setResponse);
+    function showTableData(responseData){
+        $scope.loading = false;
+        $('.loadingMask').hide();
+        if($rootScope.formId === '#otherProfileForm'){
+            $scope.otherProfileData = responseData;
+            if(! angular.isUndefined($scope.otherProfileData.backgroundMessage)){
+                $scope.otherProfileFormSuccessMsg = true;
+                $('#otherProfileFormSuccessMsg').html($scope.otherProfileData.backgroundMessage);
+                setTimeout(function(){
+                    $scope.otherProfileFormSuccessMsg = false;
+                    $('#otherProfileFormSuccessMsg').fadeOut('slow');
+                }, 1500);
+            };
+            $scope.showTableDataOtherProfile = true;
+            $scope.otherProfileForm.stepValue = null;
+            $scope.otherProfileForm.emailField = null;
+        }else{
+            $scope.myProfileData = responseData;
+            console.log(!angular.isUndefined($scope.myProfileData.backgroundMessage));
+            if(!angular.isUndefined($scope.myProfileData.backgroundMessage)){
+                $scope.myProfileFormSuccessMsg = true;
+                $('#myProfileFormSuccessMsg').html($scope.myProfileData.backgroundMessage);
+                setTimeout(function(){
+                    $scope.myProfileFormSuccessMsg = false;
+                    $('#myProfileFormSuccessMsg').fadeOut('slow');
+                }, 1500);
+            };
+            $scope.showTableDataMyProfile = true;
+            $scope.myProfileForm.stepValue = null;
+            $scope.myProfileForm.emailField = null;
+        }
     }
 
-}
+};
 
-function TopController($scope,$rootScope, $http){
-}
+var Top50Controller = function($scope,$rootScope, $http){
+    var httpPromise = $http;
+    $scope.loading = true;
+    $('.loadingMask').show();
+    var top50ProfileData = '/top';
+    callServerGETAPI(httpPromise, top50ProfileData, showTop50Profiles);
 
+    function showTop50Profiles(responseData){
+        $scope.loading = false;
+        $('.loadingMask').hide();
+        $scope.top50Profiles = responseData.top50;
+    }
+};
 function callServerGETAPI(httpPromise, apiName, reponseHandler){
 	httpPromise.get(apiName).success(reponseHandler);
 }

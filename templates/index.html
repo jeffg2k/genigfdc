@@ -5,9 +5,7 @@
         <script type="text/javascript" src="/static/js/lib/angular.js"></script>
         <script type="text/javascript" src="/static/js/app.js"></script>
         <link rel="stylesheet" href="/static/css/custom.css">
-        <!-- Loading Bootstrap -->
         <link href="/static/css/bootstrap.css" rel="stylesheet">
-        <!-- Loading Flat UI -->
         <link href="/static/css/flat-ui.css" rel="stylesheet">
         <link href="/static/css/demo.css" rel="stylesheet">
     </head>
@@ -29,28 +27,50 @@
                             <div class="collapse navbar-collapse" id="navbar-collapse-01">
                               <ul class="nav navbar-nav navbar-right">
                                 <li><a href="#/unique">Profiles</a></li>
-                                <li><a href="#/top">Top 50</a></li>
+                                <li><a href="#/top50">Top 50</a></li>
                                 <li><a href="#/home">Family</a></li>
+                                <li><a href="javascript:viod(0)" data-toggle="modal"
+                                       data-target="#contactForm">Contact</a></li>
                                 <li><a href="/logout">Logout</a></li>
                                </ul>
                             </div>
                         </div>
-					</nav>
+                    </nav>
                 </div>
             </div>
-            <div id="loading" style="position: center; width:100px; top: 0px; display: none; background: gold; padding: 0.1em; font-weight: bold;">Loading...</div>
             <div id='pageContent' class='row1'>
-                <div ng-view=""></div>
+                <div ng-view=""> </div>
+                <div class='loadingMask' ng-show="loading">
+                        <div class='loading'></div>
+                    </div>
+                <!-- Modal -->
+                <div class="modal fade" id="contactForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+                     aria-hidden="true">
+                  <div class="modal-dialog">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="contactFormLabel">Contact us</h4>
+                      </div>
+                      <div class="modal-body">
+                        <script type="text/javascript" src="http://form.jotform.us/jsform/40618781407154"></script>
+                      </div>
+                      <!--<div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save changes</button>
+                      </div>-->
+                    </div>
+                  </div>
+                </div>
             </div>
+            <footer>
+                <hr />
+                <p class=''><strong>&copy; GFDC</strong></p>
+            </footer>
             </div>
-		<footer>
-      		<hr />
-      		<p class=''><strong>&copy; Geni Forest Density Calculator</strong></p>
-		</footer>
-
         </div>
         <script src="/static/js/lib/jquery-1.8.3.min.js"></script>
         <script src="/static/js/lib/jquery-ui-1.10.3.custom.min.js"></script>
-        <script src="/static/js/lib/bootstrap.min.js"></script>
+		<script src="/static/js/lib/bootstrap.min.js"></script>
 </body>
 </html>
