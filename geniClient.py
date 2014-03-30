@@ -14,7 +14,8 @@ PROF_URL = 'https://www.geni.com/api/profile/immediate-family'
 IMM_FAM_URL = 'https://www.geni.com/api/?/immediate-family'
 #PROF_URL = 'https://www.geni.com/api/profile'
 INVALIDATE_URL = 'https://www.geni.com/platform/oauth/invalidate_token'
-PUBLIC_URL = 'http://www.geni.com/people/{name}/{guid}'
+#PUBLIC_URL = 'http://www.geni.com/people/{name}/{guid}'
+PUBLIC_URL = 'http://www.geni.com/people/private/{guid}'
 OTHERS_URL = 'https://www.geni.com/api/profile-G{guid}'
 
 def buildAuthUrl():
@@ -45,6 +46,8 @@ def getProfileDetails(accessToken, profileId):
     else:
         url = IMM_FAM_URL.replace('?', profileId)
         profileResponse = requests.get(url, params=payload)
+    print 'called geni api'
+    print profileResponse.text
     profileObj = getProfileObj(profileResponse.text)
     return profileObj
 
@@ -55,18 +58,23 @@ def getOtherProfile(accessToken, guid):
     return profileResponse.text
 
 def getProfileObj(profileResponse):
-    jsoncontents = json.loads(profileResponse)
-    firstName = jsoncontents['focus']['first_name']
-    lastName = jsoncontents['focus']['last_name']
-    publicUrl = PUBLIC_URL
-    publicUrl = publicUrl.replace('{name}', firstName + '-' + lastName)
-    publicUrl = publicUrl.replace('{guid}', jsoncontents['focus']['guid'])
-    #p = Profile(jsoncontents['focus']['id'], publicUrl,
-    #        firstName + ' ' + lastName, [], jsoncontents['focus']['gender'])
     data = {}
+    jsoncontents = json.loads(profileResponse)
+    error = jsoncontents.get('error', False)
+    if error != False:
+        data['status'] = 'API_ERROR'
+        return data
+    data['status'] = 'SUCCESS'
+    #firstName = jsoncontents['focus']['first_name']
+    #lastName = jsoncontents['focus']['last_name']
+
+    publicUrl = PUBLIC_URL
+    #publicUrl = publicUrl.replace('{name}', firstName + '-' + lastName)
+    publicUrl = publicUrl.replace('{guid}', jsoncontents['focus']['guid'])
     data['id'] = jsoncontents['focus']['id']
-    data['name'] = firstName + ' ' + lastName
-    data['gender'] = jsoncontents['focus']['gender']
+    #data['name'] = firstName + ' ' + lastName
+    #data['name'] = jsoncontents['focus']['name']
+    data['gender'] = '' #jsoncontents['focus']['gender']
     data['geniLink'] = publicUrl
     contents = jsoncontents['nodes']
     relations = []
@@ -75,9 +83,7 @@ def getProfileObj(profileResponse):
             #p.addRelation(contents[node]['first_name'] + ' ' + contents[node]['last_name'],
             #          contents[node]['gender'], contents[node]['id'])
             try:
-                relations.append({'id':contents[node]['id'],
-                              'name':contents[node]['first_name'] + ' ' + contents[node]['last_name'],
-                              'gender':contents[node]['gender']})
+                relations.append({'id':contents[node]['id']})
             except:
                 pass
     data['relations'] = relations

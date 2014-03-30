@@ -1,3 +1,5 @@
+from setenvs import set_configs
+set_configs
 import os
 from flask import Flask, redirect, request, session, url_for, jsonify, send_file, make_response, Response
 import requests
@@ -64,7 +66,7 @@ def getUniqueCount():
             params['email'] = email
             params['includeInTop50'] = includeInTop50
             params['stepCount'] = stepCount
-            q.enqueue('app.createBackgroundJob', params)
+            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=3600)
             data = {}
             data['backgroundMessage'] = 'job started'
             return jsonify(data)
@@ -84,7 +86,7 @@ def getUniqueCount():
             params['otherId'] = profileData['id']
             params['includeInTop50'] = includeInTop50
             params['stepCount'] = stepCount
-            q.enqueue('app.createBackgroundJob', params)
+            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=3600)
             data = {}
             data['backgroundMessage'] = 'job started'
             return jsonify(data)
@@ -107,21 +109,22 @@ def getStepProfiles(count, visitedSet, profileId):
     nextStepProfiles = ''
     if currentStep == 0:
         profileData = getProfileDetails(session['accessToken'], profileId)
-        session['loginProfileId'] = profileData['id']
-        session['stepUserLink'] = profileData['geniLink']
-        session[profileData['id']] = profileData
-        loginProfileId = session['loginProfileId']
-        profileData = session[loginProfileId]
-        visitedSet.add(loginProfileId)
-        #session['visited-' + loginProfileId] = True
-        for node in profileData['relations']:
-            uniqueCount = uniqueCount + 1
-            nextStepProfiles = nextStepProfiles + '*' + node['id']  # *** delimiter
-            #session['visited-' + node['id']] = True
-            visitedSet.add(node['id'])
+        if profileData['status'] == 'SUCCESS':
+            session['loginProfileId'] = profileData['id']
+            session['stepUserLink'] = profileData['geniLink']
+            session[profileData['id']] = profileData
+            loginProfileId = session['loginProfileId']
+            profileData = session[loginProfileId]
+            visitedSet.add(loginProfileId)
+            #session['visited-' + loginProfileId] = True
+            for node in profileData['relations']:
+                uniqueCount = uniqueCount + 1
+                nextStepProfiles = nextStepProfiles + '*' + node['id']  # *** delimiter
+                #session['visited-' + node['id']] = True
+                visitedSet.add(node['id'])
 
-        session['nextStepProfiles'] = nextStepProfiles[1:]
-        session['totalProfiles'] = uniqueCount
+            session['nextStepProfiles'] = nextStepProfiles[1:]
+            session['totalProfiles'] = uniqueCount
     else:
         nextStepProfiles = session['nextStepProfiles']
         profileIds = nextStepProfiles.split('*')
@@ -132,16 +135,17 @@ def getStepProfiles(count, visitedSet, profileId):
                     profileData = session[profileId]
             except KeyError:
                 profileData = getProfileDetails(session['accessToken'], profileId)
-            #Got profile data, process each relation
-            session[profileData['id']] = profileData
-            for node in profileData['relations']:
-                nodeId = node['id']
-                if nodeId in visitedSet:
-                    pass
-                else:
-                    nextStepProfiles = nextStepProfiles + '*' + node['id']
-                    uniqueCount = uniqueCount + 1
-                    visitedSet.add(node['id'])
+            if profileData['status'] == 'SUCCESS':
+                #Got profile data, process each relation
+                session[profileData['id']] = profileData
+                for node in profileData['relations']:
+                    nodeId = node['id']
+                    if nodeId in visitedSet:
+                        pass
+                    else:
+                        nextStepProfiles = nextStepProfiles + '*' + node['id']
+                        uniqueCount = uniqueCount + 1
+                        visitedSet.add(node['id'])
         session['nextStepProfiles'] = nextStepProfiles[1:]
         session['totalProfiles'] = session['totalProfiles'] + uniqueCount
     currentStep = currentStep + 1
@@ -182,21 +186,22 @@ def getStepProfilesThread(accessToken, count, visitedSet, profileId, localSessio
     nextStepProfiles = ''
     if currentStep == 0:
         profileData = getProfileDetails(accessToken, profileId)
-        localSession['loginProfileId'] = profileData['id']
-        localSession['stepUserLink'] = profileData['geniLink']
-        localSession[profileData['id']] = profileData
-        loginProfileId = localSession['loginProfileId']
-        profileData = localSession[loginProfileId]
-        visitedSet.add(loginProfileId)
-        #session['visited-' + loginProfileId] = True
-        for node in profileData['relations']:
-            uniqueCount = uniqueCount + 1
-            nextStepProfiles = nextStepProfiles + '*' + node['id']  # *** delimiter
-            #session['visited-' + node['id']] = True
-            visitedSet.add(node['id'])
+        if profileData['status'] == 'SUCCESS':
+            localSession['loginProfileId'] = profileData['id']
+            localSession['stepUserLink'] = profileData['geniLink']
+            localSession[profileData['id']] = profileData
+            loginProfileId = localSession['loginProfileId']
+            profileData = localSession[loginProfileId]
+            visitedSet.add(loginProfileId)
+            #session['visited-' + loginProfileId] = True
+            for node in profileData['relations']:
+                uniqueCount = uniqueCount + 1
+                nextStepProfiles = nextStepProfiles + '*' + node['id']  # *** delimiter
+                #session['visited-' + node['id']] = True
+                visitedSet.add(node['id'])
 
-        localSession['nextStepProfiles'] = nextStepProfiles[1:]
-        localSession['totalProfiles'] = uniqueCount
+            localSession['nextStepProfiles'] = nextStepProfiles[1:]
+            localSession['totalProfiles'] = uniqueCount
     else:
         nextStepProfiles = localSession['nextStepProfiles']
         profileIds = nextStepProfiles.split('*')
@@ -207,16 +212,17 @@ def getStepProfilesThread(accessToken, count, visitedSet, profileId, localSessio
                     profileData = localSession[profileId]
             except KeyError:
                 profileData = getProfileDetails(accessToken, profileId)
-            #Got profile data, process each relation
-            localSession[profileData['id']] = profileData
-            for node in profileData['relations']:
-                nodeId = node['id']
-                if nodeId in visitedSet:
-                    pass
-                else:
-                    nextStepProfiles = nextStepProfiles + '*' + node['id']
-                    uniqueCount = uniqueCount + 1
-                    visitedSet.add(node['id'])
+            if profileData['status'] == 'SUCCESS':
+                #Got profile data, process each relation
+                localSession[profileData['id']] = profileData
+                for node in profileData['relations']:
+                    nodeId = node['id']
+                    if nodeId in visitedSet:
+                        pass
+                    else:
+                        nextStepProfiles = nextStepProfiles + '*' + node['id']
+                        uniqueCount = uniqueCount + 1
+                        visitedSet.add(node['id'])
         localSession['nextStepProfiles'] = nextStepProfiles[1:]
         localSession['totalProfiles'] = localSession['totalProfiles'] + uniqueCount
     currentStep = currentStep + 1
@@ -255,52 +261,6 @@ def getProfile():
         session[profileData['id']] = profileData
     return jsonify(profileData)
 
-@app.route('/getUniqueCountOld')
-def getUniqueCountOld():
-    uniqueCount = 0
-    nextStepProfiles = ''
-    currentStep = session['currentStep']
-    if currentStep == 0:
-        profileData = getProfileDetails(session['accessToken'], None)
-        session['loginProfileId'] = profileData['id']
-        session[profileData['id']] = profileData
-        loginProfileId = session['loginProfileId']
-        profileData = session[loginProfileId]
-        session['visited-' + loginProfileId] = True
-        for node in profileData['relations']:
-            uniqueCount = uniqueCount + 1
-            nextStepProfiles = nextStepProfiles + '*' + node['id']  # *** delimiter
-            session['visited-' + node['id']] = True
-
-        session['nextStepProfiles'] = nextStepProfiles[1:]
-        session['totalProfiles'] = uniqueCount
-    else:
-        nextStepProfiles = session['nextStepProfiles']
-        profileIds = nextStepProfiles.split('*')
-        nextStepProfiles = ''
-        for profileId in profileIds:
-            try:
-                if session[profileId] != None:
-                    profileData = session[profileId]
-            except KeyError:
-                profileData = getProfileDetails(session['accessToken'], profileId)
-            #Got profile data, process each relation
-            session[profileData['id']] = profileData
-            for node in profileData['relations']:
-                nodeId = node['id']
-                try:
-                    if session['visited-' + nodeId] == True:
-                        pass
-                except KeyError:
-                    nextStepProfiles = nextStepProfiles + '*' + node['id']
-                    uniqueCount = uniqueCount + 1
-                    session['visited-' + node['id']] = True
-        session['nextStepProfiles'] = nextStepProfiles[1:]
-        session['totalProfiles'] = session['totalProfiles'] + uniqueCount
-    currentStep = currentStep + 1
-    session['currentStep'] = currentStep
-    return jsonify({'step':currentStep, 'uniqueCount':uniqueCount, 'total':session['totalProfiles']})
-
 @app.route('/top')
 def top():
     #accessToken = session['accessToken']
@@ -328,29 +288,6 @@ def page_not_found(error):
     print error
     return 'This page does not exist', 500
 
-@app.route('/getJsonTest', methods=['GET'])
-def getJsonTest():
-    geniFile = open('./geni.json','r')
-    contents = geniFile.read()
-    jsoncontents = json.loads(contents)
-    p = Profile(jsoncontents['focus']['id'], 'publicUrl',
-            'firstName' + ' ' + 'lastName', [], jsoncontents['focus']['gender'])
-    contents = jsoncontents['nodes']
-    for node in contents:
-        if node.startswith('profile') and jsoncontents['focus']['id'] != contents[node]['id']:
-            p.addRelation(contents[node]['first_name'] + ' ' + contents[node]['last_name'],
-                      contents[node]['gender'], contents[node]['id'])
-    data = {}
-    data['id'] = p.id
-    data['name'] = p.name
-    data['gender'] = p.gender
-    data['geniLink'] = p.geniLink
-    relations = []
-    for node in p.relations:
-        relations.append({'id':node.id,'name':node.name,'gender':node.gender})
-    data['relations'] = relations
-    return jsonify(data)
-
 def setTokens(tokenResponse):
     tokenResponse = json.loads(tokenResponse)
     session['accessToken'] = tokenResponse['access_token']
@@ -362,6 +299,7 @@ app.secret_key = '12345abcde'
 
 if __name__ == '__main__':
     # Bind to PORT if defined, otherwise default to 5000.
+    set_configs
     port = int(os.environ.get('PORT', 5000))
     app.debug = False
     #app.testing = True

@@ -62,26 +62,6 @@ function HomeController($scope,$rootScope, $http){
 
 var UniqueController = function($scope,$rootScope, $http){
     var httpPromise = $http;
-    /*$scope.loading = true;
-    $('.loadingMask').show();
-    var onloadProfileData = 'js/json/onloadProfileCountJSON.js';
-    var me = this;
-    callServerGETAPI(httpPromise, onloadProfileData, loadProfileData);
-
-    function loadProfileData(responseData){
-        $scope.loading = false;
-        $('.loadingMask').hide();
-      $scope.isProfileExists = responseData.profileId;
-      if(angular.isUndefined($scope.isProfileExists)){
-            $scope.showUserProfile = true;
-            $scope.myProfileData = responseData;
-            $('#uniqueProfilesTab a[href="#profile"]').tab('show');
-      }else{
-            $scope.showUserProfile = false;
-            $scope.otherProfileData = responseData;
-            $('#uniqueProfilesTab a[href="#otherProfile"]').tab('show');
-      }
-    }*/
     $('#uniqueProfilesTab a[href="#profile"]').tab('show');
     $scope.showTableDataMyProfile = false;
     $scope.showTableDataOtherProfile = false;
@@ -133,7 +113,7 @@ var UniqueController = function($scope,$rootScope, $http){
                 setTimeout(function(){
                     $scope.otherProfileFormSuccessMsg = false;
                     $('#otherProfileFormSuccessMsg').fadeOut('slow');
-                }, 1500);
+                }, 2500);
             };
             $scope.showTableDataOtherProfile = true;
             $scope.otherProfileForm.stepValue = null;
