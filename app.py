@@ -68,7 +68,7 @@ def getUniqueCount():
             params['stepCount'] = stepCount
             q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=21600)
             data = {}
-            data['backgroundMessage'] = 'job started'
+            data['backgroundMessage'] = '<h6>Background Job started. You would receive an email when job is finished.</h6>'
             return jsonify(data)
     else:
         #Other profiles
@@ -88,7 +88,7 @@ def getUniqueCount():
             params['stepCount'] = stepCount
             q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=21600)
             data = {}
-            data['backgroundMessage'] = 'job started'
+            data['backgroundMessage'] = '<h6>Background Job started. You would receive an email when job is finished.</h6>'
             return jsonify(data)
 
     data['steps'] = steps

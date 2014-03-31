@@ -110,10 +110,11 @@ var UniqueController = function($scope,$rootScope, $http){
             if(! angular.isUndefined($scope.otherProfileData.backgroundMessage)){
                 $scope.otherProfileFormSuccessMsg = true;
                 $('#otherProfileFormSuccessMsg').html($scope.otherProfileData.backgroundMessage);
+                $('#otherProfileFormSuccessMsg').css("background-color","#00BFFF");
                 setTimeout(function(){
                     $scope.otherProfileFormSuccessMsg = false;
                     $('#otherProfileFormSuccessMsg').fadeOut('slow');
-                }, 2500);
+                }, 5000);
             };
             $scope.showTableDataOtherProfile = true;
             $scope.otherProfileForm.stepValue = null;
@@ -124,10 +125,11 @@ var UniqueController = function($scope,$rootScope, $http){
             if(!angular.isUndefined($scope.myProfileData.backgroundMessage)){
                 $scope.myProfileFormSuccessMsg = true;
                 $('#myProfileFormSuccessMsg').html($scope.myProfileData.backgroundMessage);
+                $('#myProfileFormSuccessMsg').css("background-color","#00BFFF");
                 setTimeout(function(){
                     $scope.myProfileFormSuccessMsg = false;
                     $('#myProfileFormSuccessMsg').fadeOut('slow');
-                }, 1500);
+                }, 5000);
             };
             $scope.showTableDataMyProfile = true;
             $scope.myProfileForm.stepValue = null;
