@@ -66,7 +66,7 @@ def getUniqueCount():
             params['email'] = email
             params['includeInTop50'] = includeInTop50
             params['stepCount'] = stepCount
-            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=21600)
+            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=43200)
             data = {}
             data['backgroundMessage'] = '<h6>Background Job started. You would receive an email when job is finished.</h6>'
             return jsonify(data)
@@ -86,7 +86,7 @@ def getUniqueCount():
             params['otherId'] = profileData['id']
             params['includeInTop50'] = includeInTop50
             params['stepCount'] = stepCount
-            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=21600)
+            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=43200)
             data = {}
             data['backgroundMessage'] = '<h6>Background Job started. You would receive an email when job is finished.</h6>'
             return jsonify(data)
