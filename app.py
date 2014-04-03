@@ -54,7 +54,7 @@ def getUniqueCount():
     steps = []
     visitedSet = Set()
     if myProfileFlag == 'true':
-        if not email:
+        if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
                 stepData = getStepProfiles(step, visitedSet, None)
                 steps.append(stepData)
@@ -66,15 +66,17 @@ def getUniqueCount():
             params['email'] = email
             params['includeInTop50'] = includeInTop50
             params['stepCount'] = stepCount
+            print 'Scheduling job for logged in profile with below details:'
+            print 'Steps : ' + str(stepCount) + ', email : ' + email
             q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=43200)
             data = {}
-            data['backgroundMessage'] = '<h6>Background Job started. You would receive an email when job is finished.</h6>'
+            data['backgroundMessage'] = '<b>Background Job started. You would receive an email when job is finished.</b>'
             return jsonify(data)
     else:
         #Other profiles
         profileData = getOtherProfile(session['accessToken'], otherId)
         profileData = json.loads(profileData)
-        if not email:
+        if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
                 stepData = getStepProfiles(step, visitedSet, profileData['id'])
                 steps.append(stepData)
@@ -86,9 +88,11 @@ def getUniqueCount():
             params['otherId'] = profileData['id']
             params['includeInTop50'] = includeInTop50
             params['stepCount'] = stepCount
+            print 'Scheduling job for other profile with below details:' + profileData['id']
+            print 'Steps : ' + str(stepCount) + ', email : ' + email
             q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=43200)
             data = {}
-            data['backgroundMessage'] = '<h6>Background Job started. You would receive an email when job is finished.</h6>'
+            data['backgroundMessage'] = '<b>Background Job started. You would receive an email when job is finished.</b>'
             return jsonify(data)
 
     data['steps'] = steps
@@ -165,11 +169,13 @@ def createBackgroundJob(params):
         for step in range(0, int(stepCount)):
                 stepData = getStepProfilesThread(params['accessToken'], step, visitedSet, None, localSession)
                 steps.append(stepData)
+                print 'Calculated logged in profile counts for step:' + str(step + 1)
         data['profileId'] = localSession['loginProfileId']
     else:
         for step in range(0, int(stepCount)):
                 stepData = getStepProfilesThread(params['accessToken'], step, visitedSet, params['otherId'], localSession)
                 steps.append(stepData)
+                print 'Calculated other profile ' + params['otherId'] +' counts for step:' + str(step + 1)
         data['profileId'] = params['otherId']
 
     #if top50 checked

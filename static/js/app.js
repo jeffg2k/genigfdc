@@ -70,6 +70,12 @@ var UniqueController = function($scope,$rootScope, $http){
         $rootScope.formId = formId;
         var submiProfileAPI = '/getUniqueCount?'+getFormData;
         if($rootScope.formId === '#myProfileForm'){
+        	if($scope.myProfileForm.stepValue > 10){
+        		alert('Please enter steps between 1 to 10.');
+        		$scope.myProfileForm.stepValue = '';
+        		$scope.myProfileForm.emailField = '';
+        		return false;
+        	}
            if($scope.myProfileForm.stepValue < 4){
                 if($scope.myProfileForm.stepValue !== ''){
                     $scope.loading = true;
@@ -85,6 +91,14 @@ var UniqueController = function($scope,$rootScope, $http){
                 }
            }
         }else{
+        	//Other form
+        	if($scope.otherProfileForm.stepValue > 10){
+        		alert('Please enter steps between 1 to 10.');
+        		$scope.otherProfileForm.stepValue = '';
+        		$scope.otherProfileForm.emailField = '';
+        		return false;
+        	}
+
             if($scope.otherProfileForm.stepValue < 4){
                 if($scope.otherProfileForm.stepValue !== ''){
                     $scope.loading = true;

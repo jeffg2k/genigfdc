@@ -46,7 +46,6 @@ def getProfileDetails(accessToken, profileId):
     else:
         url = IMM_FAM_URL.replace('?', profileId)
         profileResponse = requests.get(url, params=payload)
-    print 'Called geni api:'+url
     #print profileResponse.text
     profileObj = getProfileObj(profileResponse.text)
     return profileObj
