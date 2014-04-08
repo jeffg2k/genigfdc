@@ -70,7 +70,7 @@ def getUniqueCount():
             print 'Steps : ' + str(stepCount) + ', email : ' + email
             q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=86400)
             data = {}
-            data['backgroundMessage'] = '<b>Background Job started. You would receive an email when job is finished.</b>'
+            data['backgroundMessage'] = 'Background Job started. You will receive an e-mail with the results when they are ready. The process can take several hours or more, so please be patient.'
             return jsonify(data)
     else:
         #Other profiles
@@ -92,7 +92,7 @@ def getUniqueCount():
             print 'Steps : ' + str(stepCount) + ', email : ' + email
             q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=43200)
             data = {}
-            data['backgroundMessage'] = '<b>Background Job started. You would receive an email when job is finished.</b>'
+            data['backgroundMessage'] = 'Background Job started. You will receive an e-mail with the results when they are ready. The process can take several hours or more, so please be patient.'
             return jsonify(data)
 
     data['steps'] = steps
@@ -169,13 +169,13 @@ def createBackgroundJob(params):
         for step in range(0, int(stepCount)):
                 stepData = getStepProfilesThread(params['accessToken'], step, visitedSet, None, localSession)
                 steps.append(stepData)
-                print 'Calculated logged in profile counts for step:' + str(step + 1)
+                print 'Calculated logged in profile ' + localSession['guid'] +' counts for step:' + str(step + 1)
         data['profileId'] = localSession['loginProfileId']
     else:
         for step in range(0, int(stepCount)):
                 stepData = getStepProfilesThread(params['accessToken'], step, visitedSet, params['otherId'], localSession)
                 steps.append(stepData)
-                print 'Calculated other profile ' + params['otherId'] +' counts for step:' + str(step + 1)
+                print 'Calculated other profile ' + localSession['guid'] +' counts for step:' + str(step + 1)
         data['profileId'] = params['otherId']
 
     #if top50 checked
@@ -184,6 +184,8 @@ def createBackgroundJob(params):
 
     # Send email
     data['steps'] = steps
+    data['geniLink'] = localSession['stepUserLink']
+    data['guid'] = localSession['guid']
     sendEmail(params['email'], data)
 
 def getStepProfilesThread(accessToken, count, visitedSet, profileId, localSession):
@@ -195,6 +197,7 @@ def getStepProfilesThread(accessToken, count, visitedSet, profileId, localSessio
         if profileData['status'] == 'SUCCESS':
             localSession['loginProfileId'] = profileData['id']
             localSession['stepUserLink'] = profileData['geniLink']
+            localSession['guid'] = profileData['guid']
             localSession[profileData['id']] = profileData
             loginProfileId = localSession['loginProfileId']
             profileData = localSession[loginProfileId]

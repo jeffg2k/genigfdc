@@ -64,8 +64,6 @@ def getProfileObj(profileResponse):
         data['status'] = 'API_ERROR'
         return data
     data['status'] = 'SUCCESS'
-    #firstName = jsoncontents['focus']['first_name']
-    #lastName = jsoncontents['focus']['last_name']
 
     publicUrl = PUBLIC_URL
     #publicUrl = publicUrl.replace('{name}', firstName + '-' + lastName)
@@ -75,6 +73,7 @@ def getProfileObj(profileResponse):
     #data['name'] = jsoncontents['focus']['name']
     data['gender'] = '' #jsoncontents['focus']['gender']
     data['geniLink'] = publicUrl
+    data['guid'] = jsoncontents['focus']['guid']
     contents = jsoncontents['nodes']
     relations = []
     for node in contents:

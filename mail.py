@@ -20,12 +20,14 @@ def sendEmail(toMail, data):
 #2       12          20
 def prepateHtml(data):
     htmlContent = '<html><body>'
-    htmlContent = htmlContent + '<h3>GFDC profile counts</h3>'
-    htmlContent = htmlContent + '<h5>Profile:' + str(data['profileId']) + '</h5>'
+    htmlContent = htmlContent + '<h3>Hi,</h3><br/>'
+    htmlContent = htmlContent + '<h5>Your GFDC background job is finished.<br/></h5>'
+    htmlContent = htmlContent + '<h5>Profile submitted:<a href='+ str(data['geniLink'])+ '>' + str(data['guid'])+ '</a></h5>'
     htmlContent = htmlContent + '<table border=\'1\'><tr><th>Step</th><th>Profiles</th><th>Total</th></tr>'
     for s in data['steps']:
         htmlContent = htmlContent + '<tr><td>' + str(s['step']) + '</td><td>' + str(s['profiles']) + '</td><td>' + str(s['total']) + '</td></tr>'
     htmlContent = htmlContent + '</table><br/><br/>'
+    htmlContent = htmlContent + 'Please visit GFDC  <b><a href=\'http://gfdc.herokuapp.com\'>here</a></b>.<br/><br/>'
     htmlContent = htmlContent + 'Thank you,<br/>GFDC</body></html>'
     return htmlContent
 
