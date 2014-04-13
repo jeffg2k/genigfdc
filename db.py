@@ -23,6 +23,7 @@ class TopProfiles(Model):
         order_by = ('profiles',)
 
 class GeniProfile(Model):
+    gid = PrimaryKeyField()
     profileId = CharField()
     profileLink = CharField()
     step = IntegerField()
@@ -30,8 +31,12 @@ class GeniProfile(Model):
 
     class Meta:
         database = myDB
-        db_table = 'geni_profile'
-        primary_key = CompositeKey('profileId', 'step')
+        db_table = 'geni_profiles'
+        #primary_key = CompositeKey('profileId', 'step')
+        indexes = (
+            # create a unique index
+            (('profileId', 'step'), True),
+        )
 
 def saveGeniProfile(stepData, guid, link):
     print 'saveGeniProfile is called'
