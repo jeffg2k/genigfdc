@@ -13,7 +13,7 @@ from flaskext.kvsession import KVSessionExtension
 import threading
 import thread
 import time
-from db import saveProfile, getTopProfiles, updateTop50
+from db import saveProfile, getTopProfiles, getTop10Profiles, updateTop50, saveGeniProfile
 from sets import Set
 from mail import sendEmail
 from rq import Queue
@@ -53,10 +53,11 @@ def getUniqueCount():
     data = {}
     steps = []
     visitedSet = Set()
+    localSession = {}
     if myProfileFlag == 'true':
         if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
-                stepData = getStepProfiles(step, visitedSet, None)
+                stepData = getStepProfiles(step, visitedSet, None, localSession)
                 steps.append(stepData)
         else:
             print 'email:' + email
@@ -78,7 +79,7 @@ def getUniqueCount():
         profileData = json.loads(profileData)
         if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
-                stepData = getStepProfiles(step, visitedSet, profileData['id'])
+                stepData = getStepProfiles(step, visitedSet, profileData['id'], localSession)
                 steps.append(stepData)
         else:
             print 'creating a backgroundJob'
@@ -99,26 +100,24 @@ def getUniqueCount():
 
     #Insert into DB if required
     if includeInTop50 == 'on':
-        updateTop50(session['stepUserLink'], stepCount, session['totalProfiles'])
-
-    session['nextStepProfiles'] = None
-    session['totalProfiles'] = None
-    session['stepUserLink'] = None
-    #session['visited-' + node['id']] = True
+        saveGeniProfile(steps, localSession['guid'], localSession['stepUserLink'])
     return jsonify(data)
 
-def getStepProfiles(count, visitedSet, profileId):
+def getStepProfiles(count, visitedSet, profileId, localSession):
     currentStep = count
     uniqueCount = 0
     nextStepProfiles = ''
     if currentStep == 0:
         profileData = getProfileDetails(session['accessToken'], profileId)
         if profileData['status'] == 'SUCCESS':
-            session['loginProfileId'] = profileData['id']
-            session['stepUserLink'] = profileData['geniLink']
-            session[profileData['id']] = profileData
-            loginProfileId = session['loginProfileId']
-            profileData = session[loginProfileId]
+            localSession['loginProfileId'] = profileData['id']
+            print 'got profile details'
+            print profileData['id']
+            localSession['stepUserLink'] = profileData['geniLink']
+            localSession['guid'] = profileData['guid']
+            localSession[profileData['id']] = profileData
+            loginProfileId = localSession['loginProfileId']
+            profileData = localSession[loginProfileId]
             visitedSet.add(loginProfileId)
             #session['visited-' + loginProfileId] = True
             for node in profileData['relations']:
@@ -127,34 +126,37 @@ def getStepProfiles(count, visitedSet, profileId):
                 #session['visited-' + node['id']] = True
                 visitedSet.add(node['id'])
 
-            session['nextStepProfiles'] = nextStepProfiles[1:]
-            session['totalProfiles'] = uniqueCount
+            localSession['nextStepProfiles'] = nextStepProfiles[1:]
+            localSession['totalProfiles'] = uniqueCount
     else:
-        nextStepProfiles = session['nextStepProfiles']
+        nextStepProfiles = localSession['nextStepProfiles']
         profileIds = nextStepProfiles.split('*')
         nextStepProfiles = ''
         for profileId in profileIds:
-            try:
-                if session[profileId] != None:
-                    profileData = session[profileId]
-            except KeyError:
-                profileData = getProfileDetails(session['accessToken'], profileId)
-            if profileData['status'] == 'SUCCESS':
-                #Got profile data, process each relation
-                session[profileData['id']] = profileData
-                for node in profileData['relations']:
-                    nodeId = node['id']
-                    if nodeId in visitedSet:
-                        pass
-                    else:
-                        nextStepProfiles = nextStepProfiles + '*' + node['id']
-                        uniqueCount = uniqueCount + 1
-                        visitedSet.add(node['id'])
-        session['nextStepProfiles'] = nextStepProfiles[1:]
-        session['totalProfiles'] = session['totalProfiles'] + uniqueCount
+            if profileId == '' or profileId is None:
+                pass
+            else:
+                try:
+                    if localSession[profileId] != None:
+                        profileData = localSession[profileId]
+                except KeyError:
+                    profileData = getProfileDetails(session['accessToken'], profileId)
+                if profileData['status'] == 'SUCCESS':
+                    #Got profile data, process each relation
+                    localSession[profileData['id']] = profileData
+                    for node in profileData['relations']:
+                        nodeId = node['id']
+                        if nodeId in visitedSet:
+                            pass
+                        else:
+                            nextStepProfiles = nextStepProfiles + '*' + node['id']
+                            uniqueCount = uniqueCount + 1
+                            visitedSet.add(node['id'])
+        localSession['nextStepProfiles'] = nextStepProfiles[1:]
+        localSession['totalProfiles'] = localSession['totalProfiles'] + uniqueCount
     currentStep = currentStep + 1
-    session['currentStep'] = currentStep
-    return {'step':currentStep, 'profiles':uniqueCount, 'total':session['totalProfiles']}
+    localSession['currentStep'] = currentStep
+    return {'step':currentStep, 'profiles':uniqueCount, 'total':localSession['totalProfiles']}
 
 def createBackgroundJob(params):
     print 'i am in createBackgroundJob'
@@ -179,9 +181,10 @@ def createBackgroundJob(params):
         data['profileId'] = params['otherId']
 
     #if top50 checked
+    #if includeInTop50 == 'on':
+    #    updateTop50(localSession['stepUserLink'], stepCount, localSession['totalProfiles'])
     if includeInTop50 == 'on':
-        updateTop50(localSession['stepUserLink'], stepCount, localSession['totalProfiles'])
-
+        saveGeniProfile(steps, localSession['guid'], localSession['stepUserLink'])
     # Send email
     data['steps'] = steps
     data['geniLink'] = localSession['stepUserLink']
@@ -269,6 +272,15 @@ def getProfile():
     if profileData != None:
         session[profileData['id']] = profileData
     return jsonify(profileData)
+
+@app.route('/top10')
+def top10():
+    #accessToken = session['accessToken']
+    steps = getTop10Profiles()
+    print steps
+    data = {}
+    data['top10'] = steps
+    return jsonify(data)
 
 @app.route('/top')
 def top():

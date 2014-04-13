@@ -157,13 +157,13 @@ var Top50Controller = function($scope,$rootScope, $http){
     var httpPromise = $http;
     $scope.loading = true;
     $('.loadingMask').show();
-    var top50ProfileData = '/top';
+    var top50ProfileData = '/top10';
     callServerGETAPI(httpPromise, top50ProfileData, showTop50Profiles);
 
     function showTop50Profiles(responseData){
         $scope.loading = false;
         $('.loadingMask').hide();
-        $scope.top50Profiles = responseData.top50;
+        $scope.top50Profiles = responseData.top10;
     }
 };
 function callServerGETAPI(httpPromise, apiName, reponseHandler){
