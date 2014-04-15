@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 import json
 import requests
 from geniClient import *
-from profiles import Relation, Profile
 from simplekv.memory import DictStore
 from flaskext.kvsession import KVSessionExtension
 import threading
