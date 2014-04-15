@@ -1,7 +1,6 @@
 import os
 import requests
 import json
-from profiles import Relation, Profile
 
 BASE_URL = 'https://www.geni.com/'
 #REDIRECT_URL = 'http://gfdc.herokuapp.com/home'
