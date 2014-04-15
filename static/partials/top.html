@@ -1,4 +1,4 @@
-<div ng-controller="Top50Controller" id='top50Controller'>
+<div ng-controller="Top10Controller" id='top10Controller'>
     <h4>Top 10 profiles</h4>
     <div class='row'>
         <div class='col-xs-6 well' style='margin-left: 30px'>
@@ -11,7 +11,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat='i in top50Profiles'>
+                            <tr ng-repeat='i in top10Profiles'>
                                 <td>{{i.step}}</td>
                                 <td>{{i.profiles}}</td>
                                 <td><a href='{{i.profileLink}}' style='color: #609' target="_blank">{{i.profileId}}</a></td>

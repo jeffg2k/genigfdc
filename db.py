@@ -109,6 +109,25 @@ def getTop10Profiles():
     print data
     return steps
 
+def getTop50Profiles(stepCount):
+    steps = []
+    try:
+        myDB.connect()
+        rows = GeniProfile.select().where(GeniProfile.step == stepCount).order_by(GeniProfile.profiles.desc()).limit(step_threshold)
+        for row in rows:
+            steps.append({'profileId':row.profileId,
+                'profileLink':row.profileLink,
+                'step':row.step,
+                'profiles':row.profiles
+            })
+    except:
+        traceback.print_exc(file=sys.stdout)
+    myDB.close()
+    #data = {}
+    #data['top50'] = steps
+    #print data
+    return steps
+
 def getTop50StepProfiles(step):
     try:
         myDB.connect()
@@ -140,17 +159,6 @@ def getTopProfiles():
         traceback.print_exc(file=sys.stdout)
     myDB.close()
     return steps
-
-def updateTop50(userLink, stepCount, totalProfiles):
-    record = {}
-    #Get GUID from public url
-    url = userLink
-    guid = url[url.rindex('/')+1:]
-    record['profileId'] = guid
-    record['profileLink'] = userLink
-    record['steps'] = stepCount
-    record['profiles'] = totalProfiles
-    saveProfile(record)
 
 myDB.connect()
 TopProfiles.create_table(True)

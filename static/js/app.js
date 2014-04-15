@@ -10,10 +10,14 @@ geniframework.config(['$routeProvider', function($routeProvider){
 		templateUrl : '../../static/partials/unique.html',
 		controller : UniqueController
 	});
-    $routeProvider.when('/top50', {
+    $routeProvider.when('/top10', {
 		templateUrl : '../../static/partials/top.html',
-		controller : Top50Controller
+		controller : Top10Controller
 	});
+    $routeProvider.when('/top50', {
+        templateUrl : '../../static/partials/top50.html',
+        controller : Top50Controller
+    });
 	$routeProvider.otherwise({
     	redirectTo : '/unique'
 	});
@@ -153,19 +157,49 @@ var UniqueController = function($scope,$rootScope, $http){
 
 };
 
-var Top50Controller = function($scope,$rootScope, $http){
+var Top10Controller = function($scope,$rootScope, $http){
     var httpPromise = $http;
     $scope.loading = true;
     $('.loadingMask').show();
-    var top50ProfileData = '/top10';
-    callServerGETAPI(httpPromise, top50ProfileData, showTop50Profiles);
+    var top10ProfileData = '/top10';
+    callServerGETAPI(httpPromise, top10ProfileData, showTop10Profiles);
 
-    function showTop50Profiles(responseData){
+    function showTop10Profiles(responseData){
         $scope.loading = false;
         $('.loadingMask').hide();
-        $scope.top50Profiles = responseData.top10;
+        $scope.top10Profiles = responseData.top10;
     }
+
 };
+
+var Top50Controller = function($scope,$rootScope, $http){
+    var httpPromise = $http;
+    var me = this;
+    var getTopTenSteps =  '../../static/js/steps.js';
+    callServerGETAPI(httpPromise, getTopTenSteps, showTop10Steps);
+    $scope.selected = -1;
+    function showTop10Steps(data){
+        $scope.top10Steps = data.steps;
+        //stepProfileData
+    }
+
+    $scope.showProfileData = function(stepValue, index){
+        var getProfilesForStep = '/top50?stepValue='+stepValue;
+        $scope.selected = index;
+        console.log(index);
+        $scope.loading = true;
+        $('.loadingMask').show();
+        callServerGETAPI(httpPromise, getProfilesForStep, me.showProfilesData);
+    };
+
+    me.showProfilesData = function(data){
+        $scope.stepProfileData = data.top50;
+        $scope.loading = false;
+        $('.loadingMask').hide();
+        $scope.showResults = true;
+    };
+};
+
 function callServerGETAPI(httpPromise, apiName, reponseHandler){
 	httpPromise.get(apiName).success(reponseHandler);
 }

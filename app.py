@@ -13,7 +13,7 @@ from flaskext.kvsession import KVSessionExtension
 import threading
 import thread
 import time
-from db import saveProfile, getTopProfiles, getTop10Profiles, updateTop50, saveGeniProfile
+from db import saveProfile, getTopProfiles, getTop10Profiles, saveGeniProfile, getTop50Profiles
 from sets import Set
 from mail import sendEmail
 from rq import Queue
@@ -180,9 +180,6 @@ def createBackgroundJob(params):
                 print 'Calculated other profile ' + localSession['guid'] +' counts for step:' + str(step + 1)
         data['profileId'] = params['otherId']
 
-    #if top50 checked
-    #if includeInTop50 == 'on':
-    #    updateTop50(localSession['stepUserLink'], stepCount, localSession['totalProfiles'])
     if includeInTop50 == 'on':
         saveGeniProfile(steps, localSession['guid'], localSession['stepUserLink'])
     # Send email
@@ -275,11 +272,19 @@ def getProfile():
 
 @app.route('/top10')
 def top10():
-    #accessToken = session['accessToken']
     steps = getTop10Profiles()
     print steps
     data = {}
     data['top10'] = steps
+    return jsonify(data)
+
+@app.route('/top50')
+def top50():
+    step = request.args.get('stepValue')
+    steps = getTop50Profiles(step)
+    print steps
+    data = {}
+    data['top50'] = steps
     return jsonify(data)
 
 @app.route('/top')

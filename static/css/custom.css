@@ -30,9 +30,9 @@ footer hr{border-top: 1px solid #2f4154}
 .error{color: #f00; font-size: 13px;}
 .form-group{margin-bottom: 5px !important}
 .nav-tabs{border-bottom: 0 !important}
-#top50Controller .col-xs-3{width: 20%; margin-left:35px; font-size: 13px;}
-#top50Controller .col-xs-3 p{margin-bottom: 5px}
-#top50Controller h5{font-size: 16px;margin: 0 0 20px 20px;}
+#top10Controller .col-xs-3{width: 20%; margin-left:35px; font-size: 13px;}
+#top10Controller .col-xs-3 p{margin-bottom: 5px}
+#top10Controller h5{font-size: 16px;margin: 0 0 20px 20px;}
 
 .modal-title{font-size: 15px;}
 .loadingMask{
@@ -61,3 +61,10 @@ footer {
 .navbar-nav > li > a{font-size:14px !important;padding: 15px 10px !important}
 #myProfile .tableData{margin-top: 0}
 .form-group{margin-bottom: 15px !important}
+
+#Top50Controller h5{font-size: 15px;padding-left: 15px;}
+#Top50Controller .col-xs-2{padding: 0;margin: 0}
+#Top50Controller ul li{margin-bottom: 10px;display: block;}
+#Top50Controller ul li a{color: #FFF;}
+#Top50Controller ul{margin-left: 0;padding-left: 0}
+#Top50Controller ul li.btn.active{background-color: #5dade2 !important;border-color: #5dade2 !important}

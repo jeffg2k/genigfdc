@@ -1,0 +1,36 @@
+<div ng-controller="Top50Controller" id='Top50Controller'>
+    <center>
+    	<h4>Top 50 Profiles</h4>
+		(Please click on any step for top 50 profiles)
+    </center>
+    <div class='col-xs-12 rowcol-xs-12'>
+    	<div class='col-xs-2'>
+    		<ul class='list-unstyled'>
+    			<li class='btn btn-block btn-sm btn-default' ng-repeat='i in top10Steps' ng-click='showProfileData(i.stepValue, $index)' ng-class='{active: $index == selected}'>
+    				<a href='javascript:void(0)'>{{i.stepValue}}</a>
+    			</li>
+    		</ul>
+    	</div>
+    	<div class='col-xs-8 pull-right'>
+    		<div class='well' ng-show='showResults'>
+	    		<table class='table table-bordered'>
+	                <thead>
+	                    <tr>
+	                        <th>Profile Id</th>
+	                        <th>Step</th>
+	                        <th>Profiles</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr ng-repeat='i in stepProfileData'>
+	                        <td><a href='{{i.profileLink}}' style='color: #609' target='_blank'>{{i.profileId}}</a></td>
+	                        <td>{{i.step}}</td>
+	                        <td>{{i.profiles}}</td>
+	                    </tr>
+	                </tbody>
+	            </table>
+        	</div>
+    	</div>
+    </div>
+
+</div>
