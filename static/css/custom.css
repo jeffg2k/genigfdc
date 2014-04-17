@@ -55,7 +55,6 @@ html, body{height:100%}
 }
 footer {
    position:absolute;
-   bottom:0;
    width:100%;
 }
 .navbar-nav > li > a{font-size:14px !important;padding: 15px 10px !important}

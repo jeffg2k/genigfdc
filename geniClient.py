@@ -1,6 +1,7 @@
 import os
 import requests
 import json
+import time
 
 BASE_URL = 'https://www.geni.com/'
 #REDIRECT_URL = 'http://gfdc.herokuapp.com/home'
@@ -16,6 +17,8 @@ INVALIDATE_URL = 'https://www.geni.com/platform/oauth/invalidate_token'
 #PUBLIC_URL = 'http://www.geni.com/people/{name}/{guid}'
 PUBLIC_URL = 'http://www.geni.com/people/private/{guid}'
 OTHERS_URL = 'https://www.geni.com/api/profile-G{guid}'
+GENI_API_COUNT = 0
+GENI_API_SLEEP_LIMIT = 50
 
 def buildAuthUrl():
     params = {
@@ -40,12 +43,18 @@ def getNewToken(code):
 
 def getProfileDetails(accessToken, profileId):
     payload = {'access_token':accessToken}
+    global GENI_API_COUNT
+    if GENI_API_COUNT == GENI_API_SLEEP_LIMIT:
+        print 'sleeping before geni api calling'
+        time.sleep(0.5)
+        GENI_API_COUNT = 0
     if not profileId:
         profileResponse = requests.get(PROF_URL, params=payload)
     else:
         url = IMM_FAM_URL.replace('?', profileId)
         profileResponse = requests.get(url, params=payload)
     #print profileResponse.text
+    GENI_API_COUNT = GENI_API_COUNT + 1
     profileObj = getProfileObj(profileResponse.text)
     return profileObj
 

@@ -50,7 +50,7 @@ def saveGeniProfile(stepData, guid, link):
                                              GeniProfile.step == record['step']).get()
             if(profile != None):
                 #existing record, update counts
-                q = GeniProfile.update(profiles=record['profiles']).where(
+                q = GeniProfile.update(profiles=record['total']).where(
                             GeniProfile.profileId == guid, GeniProfile.step == record['step'])
                 q.execute()
         except Exception as e:
@@ -59,7 +59,7 @@ def saveGeniProfile(stepData, guid, link):
                 profileId = guid,
                 profileLink = link,
                 step = record['step'],
-                profiles = record['profiles']
+                profiles = record['total']
             )
     myDB.close()
 
@@ -106,7 +106,6 @@ def getTop10Profiles():
     myDB.close()
     data = {}
     data['top50'] = steps
-    print data
     return steps
 
 def getTop50Profiles(stepCount):

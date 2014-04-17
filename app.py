@@ -90,7 +90,7 @@ def getUniqueCount():
             params['stepCount'] = stepCount
             print 'Scheduling job for other profile with below details:' + profileData['id']
             print 'Steps : ' + str(stepCount) + ', email : ' + email
-            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=43200)
+            q.enqueue_call(func='app.createBackgroundJob', args=(params,), timeout=86400)
             data = {}
             data['backgroundMessage'] = 'Background Job started. You will receive an e-mail with the results when they are ready. The process can take several hours or more, so please be patient.'
             return jsonify(data)
@@ -272,7 +272,6 @@ def getProfile():
 @app.route('/top10')
 def top10():
     steps = getTop10Profiles()
-    print steps
     data = {}
     data['top10'] = steps
     return jsonify(data)
@@ -281,7 +280,6 @@ def top10():
 def top50():
     step = request.args.get('stepValue')
     steps = getTop50Profiles(step)
-    print steps
     data = {}
     data['top50'] = steps
     return jsonify(data)
