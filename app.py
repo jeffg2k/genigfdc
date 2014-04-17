@@ -81,7 +81,7 @@ def getUniqueCount():
                 stepData = getStepProfiles(step, visitedSet, profileData['id'], localSession)
                 steps.append(stepData)
         else:
-            print 'creating a backgroundJob'
+            print '==creating a backgroundJob=='
             params = {}
             params['accessToken'] = session['accessToken']
             params['email'] = email
