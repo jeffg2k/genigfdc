@@ -78,8 +78,9 @@ def getProfileObj(profileResponse):
     publicUrl = publicUrl.replace('{guid}', jsoncontents['focus']['guid'])
     data['id'] = jsoncontents['focus']['id']
     #data['name'] = firstName + ' ' + lastName
-    #data['name'] = jsoncontents['focus']['name']
-    data['gender'] = '' #jsoncontents['focus']['gender']
+    profileName = jsoncontents['focus'].get('name', '')
+    data['profileName'] = profileName
+    #data['gender'] = '' #jsoncontents['focus']['gender']
     data['geniLink'] = publicUrl
     data['guid'] = jsoncontents['focus']['guid']
     contents = jsoncontents['nodes']
