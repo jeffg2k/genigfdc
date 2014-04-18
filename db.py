@@ -25,6 +25,7 @@ class TopProfiles(Model):
 class GeniProfile(Model):
     gid = PrimaryKeyField()
     profileId = CharField()
+    profileName = CharField()
     profileLink = CharField()
     step = IntegerField()
     profiles = IntegerField()
@@ -38,30 +39,29 @@ class GeniProfile(Model):
             (('profileId', 'step'), True),
         )
 
-def saveGeniProfile(stepData, guid, link):
+def saveGeniProfile(stepData, name, guid, link):
     print 'saveGeniProfile is called'
 
     myDB.connect()
-
-    for record in stepData:
-        try:
-            #Check if existing profile
-            profile = GeniProfile.select().where(GeniProfile.profileId == guid,
-                                             GeniProfile.step == record['step']).get()
-            if(profile != None):
-                #existing record, update counts
-                q = GeniProfile.update(profiles=record['total']).where(
-                            GeniProfile.profileId == guid, GeniProfile.step == record['step'])
-                q.execute()
-        except Exception as e:
-            #No worries. new record
-            profile = GeniProfile.create(
-                profileId = guid,
-                profileLink = link,
-                step = record['step'],
-                profiles = record['total']
-            )
-    myDB.close()
+    try:
+        #Check if existing profile
+        profile = GeniProfile.select().where(GeniProfile.profileId == guid,
+                                             GeniProfile.step == stepData['step']).get()
+        if(profile != None):
+            #existing record, update counts
+            q = GeniProfile.update(profiles=stepData['total']).where(
+                            GeniProfile.profileId == guid, GeniProfile.step == stepData['step'])
+            q.execute()
+    except Exception as e:
+        #No worries. new record
+        profile = GeniProfile.create(
+                        profileId = guid,
+                        profileName = name,
+                        profileLink = link,
+                        step = stepData['step'],
+                        profiles = stepData['total']
+                        )
+        myDB.close()
 
 def saveProfile(record):
     print 'saveProfile is called'
@@ -93,6 +93,7 @@ def getTop10Profiles():
             for row in rows:
                 if((currentRow == 1) or (currentRow > 1 and lastCount == row.profiles)) :
                     steps.append({'profileId':row.profileId,
+                              'profileName':row.profileName,
                               'profileLink':row.profileLink,
                               'step':row.step,
                               'profiles':row.profiles
@@ -115,6 +116,7 @@ def getTop50Profiles(stepCount):
         rows = GeniProfile.select().where(GeniProfile.step == stepCount).order_by(GeniProfile.profiles.desc()).limit(step_threshold)
         for row in rows:
             steps.append({'profileId':row.profileId,
+                'profileName':row.profileName,
                 'profileLink':row.profileLink,
                 'step':row.step,
                 'profiles':row.profiles

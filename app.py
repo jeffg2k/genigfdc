@@ -57,6 +57,9 @@ def getUniqueCount():
         if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
                 stepData = getStepProfiles(step, visitedSet, None, localSession)
+                if includeInTop50 == 'on':
+                    saveGeniProfile(stepData, localSession['stepProfileName'],
+                                    localSession['guid'], localSession['stepUserLink'])
                 steps.append(stepData)
         else:
             print 'email:' + email
@@ -79,6 +82,9 @@ def getUniqueCount():
         if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
                 stepData = getStepProfiles(step, visitedSet, profileData['id'], localSession)
+                if includeInTop50 == 'on':
+                    saveGeniProfile(stepData, localSession['stepProfileName'],
+                                    localSession['guid'], localSession['stepUserLink'])
                 steps.append(stepData)
         else:
             print 'creating a backgroundJob'
@@ -96,10 +102,7 @@ def getUniqueCount():
             return jsonify(data)
 
     data['steps'] = steps
-
-    #Insert into DB if required
-    if includeInTop50 == 'on':
-        saveGeniProfile(steps, localSession['guid'], localSession['stepUserLink'])
+    data['name'] = localSession['stepProfileName']
     return jsonify(data)
 
 def getStepProfiles(count, visitedSet, profileId, localSession):
@@ -110,6 +113,7 @@ def getStepProfiles(count, visitedSet, profileId, localSession):
         profileData = getProfileDetails(session['accessToken'], profileId)
         if profileData['status'] == 'SUCCESS':
             localSession['loginProfileId'] = profileData['id']
+            localSession['stepProfileName'] = profileData['profileName']
             print 'got profile details'
             print profileData['id']
             localSession['stepUserLink'] = profileData['geniLink']
@@ -169,19 +173,22 @@ def createBackgroundJob(params):
     if otherId == '':
         for step in range(0, int(stepCount)):
                 stepData = getStepProfilesThread(params['accessToken'], step, visitedSet, None, localSession)
+                if includeInTop50 == 'on':
+                    saveGeniProfile(stepData, localSession['stepProfileName'],
+                                    localSession['guid'], localSession['stepUserLink'])
                 steps.append(stepData)
                 print 'Calculated logged in profile ' + localSession['guid'] +' counts for step:' + str(step + 1)
         data['profileId'] = localSession['loginProfileId']
     else:
         for step in range(0, int(stepCount)):
                 stepData = getStepProfilesThread(params['accessToken'], step, visitedSet, params['otherId'], localSession)
+                if includeInTop50 == 'on':
+                    saveGeniProfile(stepData, localSession['stepProfileName'],
+                                    localSession['guid'], localSession['stepUserLink'])
                 steps.append(stepData)
                 print 'Calculated other profile ' + localSession['guid'] +' counts for step:' + str(step + 1)
         data['profileId'] = params['otherId']
 
-    if includeInTop50 == 'on':
-        saveGeniProfile(steps, localSession['guid'], localSession['stepUserLink'])
-    # Send email
     data['steps'] = steps
     data['geniLink'] = localSession['stepUserLink']
     data['guid'] = localSession['guid']
@@ -197,6 +204,7 @@ def getStepProfilesThread(accessToken, count, visitedSet, profileId, localSessio
             localSession['loginProfileId'] = profileData['id']
             localSession['stepUserLink'] = profileData['geniLink']
             localSession['guid'] = profileData['guid']
+            localSession['stepProfileName'] = profileData['profileName']
             localSession[profileData['id']] = profileData
             loginProfileId = localSession['loginProfileId']
             profileData = localSession[loginProfileId]
