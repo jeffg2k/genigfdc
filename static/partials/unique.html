@@ -77,16 +77,24 @@
                 <div class='col-xs-5' style='border-right: 1px solid #ccc'>
                     <form role="form" class="form-horizontal" id='otherProfileForm' name='otherProfileForm'>
                     	<div ng-show='otherProfileFormSuccessMsg' id='otherProfileFormSuccessMsg'>Job Submitted</div>
-                        <div class="form-group">
+                        <!--<div class="form-group">
                             <label for="" class="col-sm-5 control-label">Profile Id:</label>
-                            <!--<div class="col-sm-5" style='padding-top: 10px; font-size: 15px;'>
+                            <div class="col-sm-5" style='padding-top: 10px; font-size: 15px;'>
                                 {{otherProfileData.profileId}}
-                            </div>-->
+                            </div>
                             <input type="number" class="form-control" id="otherId"
                                        name='otherId' placeholder="id" min='0'
                                        ng-model="otherProfileForm.otherId"
                                        required>
-                        </div>
+                        </div>-->
+                        <div class="form-group">
+        					<label for="" class="col-sm-5 control-label">Profile Id:</label>
+        					<div class="col-sm-5" style='padding-top: 10px; font-size: 15px;'>
+            					<input type="number" class="form-control ng-pristine ng-valid-required ng-invalid ng-invalid-number
+            						ng-valid-min col-sm-3" id="otherId" name="otherId" placeholder="id" min="0"
+            						ng-model="otherProfileForm.otherId" required="">
+        					</div>
+						</div>
                         <div class="form-group">
                             <label for="" class="col-sm-5 control-label">Steps</label>
                             <div class="col-sm-5">
