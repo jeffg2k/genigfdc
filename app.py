@@ -178,7 +178,15 @@ def createBackgroundJob(params):
                                     localSession['guid'], localSession['stepUserLink'])
                 steps.append(stepData)
                 print 'Calculated logged in profile ' + localSession['guid'] +' counts for step:' + str(step + 1)
-        data['profileId'] = localSession['loginProfileId']
+
+                #Send Email after each step
+                data['steps'] = steps
+                data['geniLink'] = localSession['stepUserLink']
+                data['guid'] = localSession['guid']
+                data['profileId'] = localSession['loginProfileId']
+                data['profileName'] = localSession['stepProfileName']
+                data['remainingSteps'] = str(int(stepCount) - int(step) - 1)
+                sendEmail(params['email'], data)
     else:
         for step in range(0, int(stepCount)):
                 stepData = getStepProfilesThread(params['accessToken'], step, visitedSet, params['otherId'], localSession)
@@ -187,7 +195,13 @@ def createBackgroundJob(params):
                                     localSession['guid'], localSession['stepUserLink'])
                 steps.append(stepData)
                 print 'Calculated other profile ' + localSession['guid'] +' counts for step:' + str(step + 1)
-        data['profileId'] = params['otherId']
+                data['profileId'] = params['otherId']
+                data['steps'] = steps
+                data['geniLink'] = localSession['stepUserLink']
+                data['guid'] = localSession['guid']
+                data['profileName'] = localSession['stepProfileName']
+                data['remainingSteps'] = str(int(stepCount) - int(step) - 1)
+                sendEmail(params['email'], data)
 
     data['steps'] = steps
     data['geniLink'] = localSession['stepUserLink']

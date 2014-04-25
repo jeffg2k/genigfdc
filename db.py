@@ -39,6 +39,20 @@ class GeniProfile(Model):
             (('profileId', 'step'), True),
         )
 
+class GeniJob(Model):
+    jid = PrimaryKeyField()
+    profileId = CharField()
+    guid = CharField()
+    apiKey = CharField()
+    step = IntegerField()
+    email = CharField()
+    dbSave = CharField()
+    status = IntegerField()
+
+    class Meta:
+        database = myDB
+        db_table = 'geni_job'
+
 def saveGeniProfile(stepData, name, guid, link):
     print 'saveGeniProfile is called'
 
@@ -49,7 +63,7 @@ def saveGeniProfile(stepData, name, guid, link):
                                              GeniProfile.step == stepData['step']).get()
         if(profile != None):
             #existing record, update counts
-            q = GeniProfile.update(profiles=stepData['total']).where(
+            q = GeniProfile.update(profiles=stepData['total'], profileName = name).where(
                             GeniProfile.profileId == guid, GeniProfile.step == stepData['step'])
             q.execute()
     except Exception as e:
@@ -144,6 +158,25 @@ def getTop50StepProfiles(step):
     myDB.close()
     return steps
 
+def getJobs():
+    jobs = None
+    try:
+        myDB.connect()
+        jobs = GeniJob.select(GeniJob.status == 'N')
+    except:
+        traceback.print_exc(file=sys.stdout)
+    myDB.close()
+    return jobs
+
+def updateJob(jid):
+    try:
+        myDB.connect()
+        q = GeniJob.update(status='Y').where(GeniJob.jid == jid)
+        q.execute()
+    except:
+        traceback.print_exc(file=sys.stdout)
+    myDB.close()
+
 def getTopProfiles():
     try:
         myDB.connect()
@@ -164,5 +197,6 @@ def getTopProfiles():
 myDB.connect()
 TopProfiles.create_table(True)
 GeniProfile.create_table(True)
+GeniJob.create_table(True)
 myDB.close()
 print 'db connect and tables created'
