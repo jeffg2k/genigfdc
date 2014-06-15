@@ -1,6 +1,7 @@
 import peewee as pw
 from peewee import *
 import os, traceback, sys
+import datetime
 
 db_host = os.getenv('GENI_DB_HOST', '')
 db_name = os.getenv('GENI_DB_NAME', '')
@@ -29,6 +30,7 @@ class GeniProfile(Model):
     profileLink = CharField()
     step = IntegerField()
     profiles = IntegerField()
+    runDate = DateTimeField(default=datetime.datetime.now)
 
     class Meta:
         database = myDB

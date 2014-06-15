@@ -206,7 +206,7 @@ def createBackgroundJob(params):
     data['steps'] = steps
     data['geniLink'] = localSession['stepUserLink']
     data['guid'] = localSession['guid']
-    sendEmail(params['email'], data)
+    #sendEmail(params['email'], data)
 
 def getStepProfilesThread(accessToken, count, visitedSet, profileId, localSession):
     currentStep = count
