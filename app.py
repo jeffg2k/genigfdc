@@ -57,6 +57,10 @@ def getUniqueCount():
         if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
                 stepData = getStepProfiles(step, visitedSet, None, localSession)
+                checkId = stepData.get('accessError')
+                if(checkId == 'ACCESS_DENIED'):
+                    data['backgroundMessage'] = 'This profile access is denied.'
+                    return jsonify(data)
                 if includeInTop50 == 'on':
                     saveGeniProfile(stepData, localSession['stepProfileName'],
                                     localSession['guid'], localSession['stepUserLink'])
@@ -79,9 +83,17 @@ def getUniqueCount():
         #Other profiles
         profileData = getOtherProfile(session['accessToken'], otherId)
         profileData = json.loads(profileData)
+        checkId = profileData.get('id')
+        if(checkId == None):
+            data['backgroundMessage'] = 'This profile access is denied.'
+            return jsonify(data)
         if int(stepCount) < 4:
             for step in range(0, int(stepCount)):
                 stepData = getStepProfiles(step, visitedSet, profileData['id'], localSession)
+                checkId = stepData.get('accessError')
+                if(checkId == 'ACCESS_DENIED'):
+                    data['backgroundMessage'] = 'This profile access is denied.'
+                    return jsonify(data)
                 if includeInTop50 == 'on':
                     saveGeniProfile(stepData, localSession['stepProfileName'],
                                     localSession['guid'], localSession['stepUserLink'])
@@ -111,6 +123,10 @@ def getStepProfiles(count, visitedSet, profileId, localSession):
     nextStepProfiles = ''
     if currentStep == 0:
         profileData = getProfileDetails(session['accessToken'], profileId)
+        checkId = profileData.get('id')
+        if(checkId == None):
+            profileData['accessError'] = 'ACCESS_DENIED'
+            return profileData
         if profileData['status'] == 'SUCCESS':
             localSession['loginProfileId'] = profileData['id']
             localSession['stepProfileName'] = profileData['profileName']
