@@ -58,7 +58,7 @@ def getProfileDetails(accessToken, profileId):
             else:
                 url = IMM_FAM_URL.replace('?', profileId, 1)
                 profileResponse = requests.get(url, params=payload)
-                profileObj = getProfileObj(profileResponse.text)
+            profileObj = getProfileObj(profileResponse.text)
             continueFlag = False
         except:     #Catch all errors
             print 'Geni api connection error...retrying'
