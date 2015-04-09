@@ -1,4 +1,3 @@
-body{background:url('../images/backgroundImgs/subtle_dots.png') repeat;}
 
 #pageContent .relations .col-xs-4{width: 30%; margin-right:2%}
 #pageContent p{font-size: 14px;}
@@ -41,25 +40,18 @@ footer hr{border-top: 1px solid #2f4154}
 .loadingMask{
     position:absolute;
     top: 0;
-    left: 0;
-    width: 100%;
+    left: -50px;
+    width: 110%;
     height: 100%;
     background: #000;
+    z-index: 999;
     opacity: 0.5;
 }
 .loadingMask .loading{background: url('/static/images/ajax-loader-bar.gif') no-repeat;width:220px; height: 19px;
     position: absolute; top: 50%; left: 45%}
 
 
-html, body{height:100%}
-.container {
-   min-height:100%;
-   position:relative;
-}
-footer {
-   position:absolute;
-   width:100%;
-}
+
 .navbar-nav > li > a{font-size:14px !important;padding: 15px 10px !important}
 #myProfile .tableData{margin-top: 0}
 .form-group{margin-bottom: 15px !important}

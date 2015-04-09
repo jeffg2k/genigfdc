@@ -43,6 +43,7 @@ def getNewToken(code):
 
 def getProfileDetails(accessToken, profileId):
     payload = {'access_token':accessToken}
+    profileObj = {}
     global GENI_API_COUNT
     if GENI_API_COUNT == GENI_API_SLEEP_LIMIT:
         print 'sleeping before geni api calling'
@@ -57,6 +58,7 @@ def getProfileDetails(accessToken, profileId):
             else:
                 url = IMM_FAM_URL.replace('?', profileId, 1)
                 profileResponse = requests.get(url, params=payload)
+            profileObj = getProfileObj(profileResponse.text)
             continueFlag = False
         except:     #Catch all errors
             print 'Geni api connection error...retrying'
@@ -64,7 +66,6 @@ def getProfileDetails(accessToken, profileId):
     #print profileResponse.text
 
     GENI_API_COUNT = GENI_API_COUNT + 1
-    profileObj = getProfileObj(profileResponse.text)
     return profileObj
 
 def getOtherProfile(accessToken, guid):

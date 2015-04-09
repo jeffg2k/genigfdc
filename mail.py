@@ -16,13 +16,13 @@ def sendEmail(toMail, data):
                               "subject": subject,
                               "html": htmlContent})
 
-#Step    Profiles    Total
-#1       8           8
-#2       12          20
 def prepateHtml(data):
     htmlContent = '<html><body>'
     htmlContent = htmlContent + '<h3>Hi,</h3><br/>'
-    htmlContent = htmlContent + '<h5>Your GFDC background job is finished.<br/></h5>'
+    if(data['remainingSteps'] == '0'):
+        htmlContent = htmlContent + '<h5>Your GFDC background job is finished.<br/></h5>'
+    else:
+        htmlContent = htmlContent + '<h5>Your GFDC background job is running.<br/></h5>'
     htmlContent = htmlContent + '<h5>Profile Name:' + data['profileName'] + '</h5>'
     htmlContent = htmlContent + '<h5>Profile ID:<a href='+ str(data['geniLink'])+ '>' + str(data['guid'])+ '</a></h5>'
     htmlContent = htmlContent + '<table border=\'1\'><tr><th>Step</th><th>Profiles</th><th>Total</th></tr>'
